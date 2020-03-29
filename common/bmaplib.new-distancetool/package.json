@@ -1,0 +1,54 @@
+{
+  "_from": "bmaplib.new-distancetool",
+  "_id": "bmaplib.new-distancetool@1.0.0",
+  "_inBundle": false,
+  "_integrity": "sha512-g2lnHkkG3aWHO4NRhRib8l5AMh1ILTwOnOQxQSPKLWa1pNfW1QleMQ1Gz8E1mwifOUC2xIfD32EBripOeCovKA==",
+  "_location": "/bmaplib.new-distancetool",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "bmaplib.new-distancetool",
+    "name": "bmaplib.new-distancetool",
+    "escapedName": "bmaplib.new-distancetool",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/bmaplib.new-distancetool/-/bmaplib.new-distancetool-1.0.0.tgz",
+  "_shasum": "ad146d843d1dad0a210d762f115c23fc71a3a5d0",
+  "_spec": "bmaplib.new-distancetool",
+  "_where": "D:\\nodejs",
+  "author": {
+    "name": "JserWang",
+    "email": "jserwang@gmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/JserWang/BMapLib.DistanceTool/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "",
+  "homepage": "https://github.com/JserWang/BMapLib.DistanceTool#readme",
+  "keywords": [
+    "baidu",
+    "map",
+    "baidu-map",
+    "distancetool"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "bmaplib.new-distancetool",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JserWang/BMapLib.DistanceTool.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.0"
+}

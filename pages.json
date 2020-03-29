@@ -1,0 +1,41 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "衢州移动故障投诉可视化分析系统2020",
+				"navigationBarTextStyle": "white",
+				"navigationBarBackgroundColor": "#0085D0",
+				"h5": {
+					"titleNView": {
+						// "type":"transparent", //透明，隐藏标题栏
+						"titleText":"衢州移动故障投诉可视化分析系统2020",
+						"titleSize": "25px"
+						// "buttons": [{
+						// 	"text": "搜索",
+						// 	"fontSize": "16",
+						// 	"fontWeight": "bold",
+						// 	"float": "left",
+						// 	"select": "true",
+						// 	"color": "#353535",
+						// 	"width": "60px"
+						// }],
+						// "searchInput": {
+						// 	"align": "center",
+						// 	"placeholder": "请输入查找关键字",
+						// 	"borderRadius": "60upx",
+						// 	"placeholderColor": "#515151",
+						// 	"backgroundColor": "# fff "
+						// }
+					}
+				}
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "衢州移动网络运维",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	}
+}
