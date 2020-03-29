@@ -83,7 +83,7 @@ export const constantRoutes = [
     path: '/complain',
     component: Layout,
     alwaysShow: true,
-    redirect: '/complain/table',
+    redirect: '/complain/complain-List',
     name: 'Complain',
     meta: { title: '无线投诉', icon: 'example' },
     children: [
@@ -97,29 +97,33 @@ export const constantRoutes = [
         path: 'complain-daily',
         name: 'Complain-daily',
         component: () => import('@/views/complain/daily/index'),
-        meta: { title: '日报表', icon: 'table' }
-      },
-      {
-        path: 'complain-week',
-        name: 'Complain-week',
-        component: () => import('@/views/complain/week/index'),
-        meta: { title: '周报表', icon: 'tree' }
+        meta: { title: '分析报表', icon: 'table' }
       }
     ]
   },
 
-  // {
-  //   path: '/form',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       name: 'Form',
-  //       component: () => import('@/views/form/index'),
-  //       meta: { title: 'Form', icon: 'form' }
-  //     }
-  //   ]
-  // },
+  {
+    path: '/fault',
+    component: Layout,
+    alwaysShow: true,
+    redirect: '/fault',
+    name: 'Fault',
+    meta: { title: '基站退服', icon: 'link' },
+    children: [
+      {
+        path: 'falut-List',
+        name: 'falut-List',
+        component: () => import('@/views/fault/index'),
+        meta: { title: '退服清单', icon: 'table' }
+      },
+      {
+        path: 'falut-List',
+        name: 'falut-List',
+        component: () => import('@/views/fault/index'),
+        meta: { title: '分析报表', icon: 'table' }
+      }
+    ]
+  },
 
   {
     path: '/nested',
@@ -127,7 +131,7 @@ export const constantRoutes = [
     redirect: '/nested/menu1',
     name: 'Nested',
     meta: {
-      title: '基站退服',
+      title: '有线故障',
       icon: 'nested'
     },
     children: [
@@ -135,7 +139,7 @@ export const constantRoutes = [
         path: 'menu1',
         component: () => import('@/views/nested/menu1/index'), // Parent router-view
         name: 'Menu1',
-        meta: { title: 'Menu1' },
+        meta: { title: '故障清单' },
         children: [
           {
             path: 'menu1-1',
