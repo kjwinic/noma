@@ -97,6 +97,12 @@ export const constantRoutes = [
         path: 'complain-daily',
         name: 'Complain-daily',
         component: () => import('@/views/complain/daily/index'),
+        meta: { title: '每日更新', icon: 'table' }
+      },
+      {
+        path: 'complain-analysis',
+        name: 'Complain-analysis',
+        component: () => import('@/views/complain/analysis/index'),
         meta: { title: '分析报表', icon: 'table' }
       }
     ]

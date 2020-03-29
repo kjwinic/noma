@@ -9,10 +9,18 @@ export function getComplain(query) {
   })
 }
 // 编辑投诉详单
-export function updateComplain(id,data) {
+export function updateComplain(id, data) {
   return request({
-    url: 'http://127.0.0.1:5000/noma/api/v1/complains/'+id,
+    url: 'http://127.0.0.1:5000/noma/api/v1/complains/' + id,
     method: 'put',
+    data
+  })
+}
+// 上传excel
+export function uploadComplain(data) {
+  return request({
+    url: 'http://127.0.0.1:5000/noma/api/v1/complains',
+    method: 'post',
     data
   })
 }
