@@ -51,7 +51,7 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: '首页', icon: 'dashboard' }
+      meta: { title: '网站首页', icon: 'dashboard', affix: true }
     }]
   },
 
@@ -67,17 +67,17 @@ export const constantRoutes = [
     }]
   },
 
-  {
-    path: '/plan',
-    component: Layout,
-    redirect: '/plan',
-    children: [{
-      path: 'plan',
-      name: 'Plan',
-      component: () => import('@/views/plan/index'),
-      meta: { title: '方案跟踪', icon: 'eye-open' }
-    }]
-  },
+  // {
+  //   path: '/plan',
+  //   component: Layout,
+  //   redirect: '/plan',
+  //   children: [{
+  //     path: 'plan',
+  //     name: 'Plan',
+  //     component: () => import('@/views/plan/index'),
+  //     meta: { title: '方案跟踪', icon: 'eye-open' }
+  //   }]
+  // },
 
   {
     path: '/complain',
@@ -85,25 +85,25 @@ export const constantRoutes = [
     alwaysShow: true,
     redirect: '/complain/complain-List',
     name: 'Complain',
-    meta: { title: '无线投诉', icon: 'example' },
+    meta: { title: '无线投诉', icon: 'form' },
     children: [
       {
-        path: 'complain-List',
-        name: 'Complain-List',
+        path: 'complain-list',
+        name: 'Complain-list',
         component: () => import('@/views/complain/list/index'),
-        meta: { title: '投诉库', icon: 'table' }
+        meta: { title: '投诉清单', icon: 'list' }
       },
       {
-        path: 'complain-daily',
-        name: 'Complain-daily',
-        component: () => import('@/views/complain/daily/index'),
-        meta: { title: '每日更新', icon: 'table' }
+        path: 'complain-plan',
+        name: 'Complain-plan',
+        component: () => import('@/views/complain/plan/index'),
+        meta: { title: '方案跟踪', icon: 'tracking' }
       },
       {
         path: 'complain-analysis',
         name: 'Complain-analysis',
         component: () => import('@/views/complain/analysis/index'),
-        meta: { title: '分析报表', icon: 'table' }
+        meta: { title: '分析报表', icon: 'analysis' }
       }
     ]
   },
@@ -114,7 +114,7 @@ export const constantRoutes = [
     alwaysShow: true,
     redirect: '/fault',
     name: 'Fault',
-    meta: { title: '基站退服', icon: 'link' },
+    meta: { title: '基站退服', icon: 'example' },
     children: [
       {
         path: 'falut-List',
@@ -126,7 +126,7 @@ export const constantRoutes = [
         path: 'falut-List',
         name: 'falut-List',
         component: () => import('@/views/fault/index'),
-        meta: { title: '分析报表', icon: 'table' }
+        meta: { title: '分析报表', icon: 'analysis' }
       }
     ]
   },

@@ -101,7 +101,7 @@
       v-loading="listLoading"
       :data="list"
       stripe
-      height="630"
+      height="620"
       element-loading-text="Loading"
       border
       fit
@@ -693,5 +693,8 @@ export default {
 .el-upload__tip{
   align-items: center;
   text-decoration: underline;
+}
+.app-container{
+  padding-top: 40px;
 }
 </style>

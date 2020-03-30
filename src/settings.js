@@ -1,16 +1,22 @@
 module.exports = {
 
-  title: '衢州移动网络运维可视化分析系统',
+  title: 'Vue Admin Template',
+
+  /**
+ * @type {boolean} true | false
+ * @description Whether need tagsView
+ */
+  tagsView: true,
 
   /**
    * @type {boolean} true | false
    * @description Whether fix the header
    */
-  fixedHeader: true, // 标题栏是否固定显示
+  fixedHeader: true,
 
   /**
    * @type {boolean} true | false
    * @description Whether show the logo in sidebar
    */
-  sidebarLogo: true // 是否显示侧边栏logo
+  sidebarLogo: true
 }
