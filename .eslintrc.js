@@ -21,6 +21,16 @@ module.exports = {
         "allowFirstLine": false
       }
     }],
+    // 取消Require self-closing on Vue.js custom components 
+    "vue/html-self-closing": ["error", {
+      "html": {
+          "void": "never",
+          "normal": "any",
+          "component": "any"
+      },
+      "svg": "always",
+      "math": "always"
+    }],
     "vue/singleline-html-element-content-newline": "off",
     "vue/multiline-html-element-content-newline":"off",
     "vue/name-property-casing": ["error", "PascalCase"],
@@ -162,7 +172,7 @@ module.exports = {
       }
     }],
     'padded-blocks': [2, 'never'],
-    'quotes': [2, 'single', {
+    'quotes': [0, 'single', {
       'avoidEscape': true,
       'allowTemplateLiterals': true
     }],
