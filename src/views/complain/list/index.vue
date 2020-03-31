@@ -466,7 +466,8 @@ export default {
         is_solved: '',
         is_overtime: '',
         start_date: '',
-        end_date: ''
+        end_date: '',
+        address: ''
       },
       citys: ['柯城', '衢江', '江山', '龙游', '常山', '开化', '外地'],
       area: ['城区', '农村'],

@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import BaiduMap from 'vue-baidu-map' // 全局引入
 
 import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 
@@ -32,6 +33,10 @@ if (process.env.NODE_ENV === 'production') {
 // Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 Vue.use(ElementUI)
+// 百度地图ak
+Vue.use(BaiduMap, {
+  ak: 'U43Xy5aiHHDKWZwQOxPn7NS8kGdv8kFO'
+})
 
 Vue.config.productionTip = false
 
