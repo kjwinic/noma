@@ -5,11 +5,11 @@
       :center="center"
       :zoom="zoom"
       :scroll-wheel-zoom="true"
-      :map-type="map_type"
+      :map-type="mapType"
       @ready="setDistanceToolInstance"
       @moveend="getMapCenter"
       @zoomend="getZoom"
-      @click="getCoord"
+      @rightclick="getCoord"
     >
       <bm-map-type :map-types="['BMAP_NORMAL_MAP', 'BMAP_HYBRID_MAP']" anchor="BMAP_ANCHOR_TOP_LEFT"></bm-map-type>
       <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_LEFT" :show-address-bar="true" :auto-location="true"></bm-geolocation><!-- 定位控件 -->
@@ -35,39 +35,38 @@
       <bm-control anchor="BMAP_ANCHOR_TOP_LEFT" :offset="{width:300,height:10}">
         <el-date-picker
           v-model="select_date"
-          format="yyyy 年 MM 月 dd 日"
+          format="yyyy-MM-dd"
           value-format="yyyy-MM-dd"
-          unlink-panels="true"
+          :unlink-panels="true"
           type="datetimerange"
           size="mini"
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
           align="right"
+          style="width:60%"
           @change="handleFilter"
         />
       </bm-control>
-      <!-- 自动填充 -->
-      <bm-control anchor="BMAP_ANCHOR_TOP_LEFT" :offset="{width: 500, height: 0}">
-        <bm-auto-complete v-model="keyword" :sug-style="{zIndex: 5}" @confirm="searchMap">
-          <view class="cu-bar search bg-white">
-            <view class="search-form round">
-              <text class="cuIcon-search"></text>
-              <!-- <input
-                :adjust-position="false"
-                type="text"
-                placeholder="搜索地图"
-                confirm-type="search"
-                class="uni-input-input"
-                :value="value"
-                @focus="InputFocus"
-                @blur="InputBlur"
-              ></input> -->
-            </view>
-          </view>
+      <!-- 下拉菜单 -->
+      <bm-control anchor="BMAP_ANCHOR_TOP_LEFT" :offset="{width:550,height:10}">
+        <el-select v-model="value" clearable placeholder="搜索类型" size="mini" style="width:55%;" type="primary" @change="handleSearch">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+      </bm-control>
+      <!-- 自动填充搜索 -->
+      <bm-control anchor="BMAP_ANCHOR_TOP_LEFT" :offset="{width: 660, height: 10}">
+        <bm-auto-complete v-model="keyword" :sug-style="sug_style">
+          <el-input v-model="keyword" size="mini" placeholder="搜索地点"></el-input>
         </bm-auto-complete>
       </bm-control>
-      <bm-local-search :localtion="center" force-local="true" :keyword="keyword" :auto-viewport="true"></bm-local-search>
+      <bm-local-search :localtion="center" :force-local="true" :keyword="keyword" :auto-viewport="true"></bm-local-search>
 
       <!-- 行政区域 -->
       <bm-boundary name="衢州市柯城区" :stroke-weight="2" stroke-color="red" fill-color=""></bm-boundary>
@@ -93,6 +92,7 @@
         <p><span class="left"></span><span class="right">{{ infoWindow.content.info2 }}</span></p>
         <p><span class="left"></span><span class="right">{{ infoWindow.content.info3 }}</span></p>
         <p><span class="left"></span><span class="right">{{ infoWindow.content.info4 }}</span></p>
+        <p><a class="edit-complain" href="">更新信息</a></p>
       </bm-info-window>
       <!-- 加载基站点 -->
       <bm-marker
@@ -117,15 +117,16 @@
         color="#00ffff"
         size="BMAP_POINT_SIZE_NORMAL"
         @click="clickComplainsHandler"
-      ></bm-point-collection>
+      >
+      </bm-point-collection>
       <!-- 加载故障海量点 -->
-      <bm-point-collection
+      <!-- <bm-point-collection
         :points="fault_points"
         shape="BMAP_POINT_SHAPE_RHOMBUS"
         color="#ff0000"
         size="BMAP_POINT_SIZE_NORMAL"
         @click="clickHandler"
-      ></bm-point-collection>
+      ></bm-point-collection> -->
       <!-- 获取坐标 -->
       <!-- <bm-marker :position="{lng: lng, lat: lat}" :dragging="true" icon="../../static/image/coord-point.png">
 				</bm-marker> -->
@@ -139,7 +140,7 @@
 import '@/styles/base.css'
 import '@/styles/infowindow.css'
 import DistanceTool from 'bmaplib.new-distancetool'
-import { reverseGeocoder } from '@/api/bmap.js'
+// import { reverseGeocoder } from '@/api/bmap.js'
 import { getComplain } from '@/api/complain.js'
 import { getSite } from '@/api/site.js'
 import { bd09towgs84, wgs84tobd09 } from '@/utils/transformCoordinate.js'
@@ -150,16 +151,16 @@ export default {
       distanceTool: '',
       auto_flag: true,
       complain_flag: false,
-      center: "衢州市",
+      center: '衢州市',
       ak: 'U43Xy5aiHHDKWZwQOxPn7NS8kGdv8kFO',
-      map_type: "BMAP_NORMAL_MAP",
+      mapType: 'BMAP_NORMAL_MAP',
       zoom: 10,
       scale: 16, // 该层级显示卫星图层
       map: {
         width: '100%',
         height: '710px'
       },
-      town: "白云街道",
+      town: '白云街道',
       address: '',
       lng: 0,
       lat: 0,
@@ -209,7 +210,21 @@ export default {
       districtType: 0, // 行政区域
       districtTypeOptions: '', // 行政区域选项
       array: ['中国', '美国', '巴西', '日本'],
-      index: 0
+      index: 0,
+      options: [{
+        value: 'map',
+        label: '搜索地图'
+      }, {
+        value: 'cp',
+        label: '搜索投诉'
+      }, {
+        value: 'site',
+        label: '搜索站点'
+      }, {
+        value: 'coord',
+        label: '搜索坐标'
+      }],
+      sug_style: { zIndex: 5 }
     }
   },
   unmount() {
@@ -264,14 +279,34 @@ export default {
       //   this.listQuery.address = this.keyword // 投诉地点搜索
       // }
     },
+    handleSearch(e) {
+      // console.log(e) // 为选中的value
+      switch (e) {
+        case 'map':
+          alert('搜索地图')
+          break;
+        case 'cp':
+          alert('搜索投诉')
+          this.sug_style = { zIndex: 1 }
+          break;
+        case 'site':
+          alert('搜索站点')
+          break;
+        case 'coord':
+          alert('搜索坐标')
+          break;
+        default:
+      }
+    },
     // 获取地图中心点坐标
     getMapCenter(e) {
-      this.lng = e.target.getCenter().lng;
-      this.lat = e.target.getCenter().lat;
+      this.lng = e.target.getCenter().lng
+      this.lat = e.target.getCenter().lat
       // alert(e.target.getCenter().lng); //获取地图中心点
+      console.log(this.town)
       if (this.zoom >= this.scale) {
-        this.map_type = "BMAP_HYBRID_MAP"; // 切换至混合地图
-        this.getSites(); // 移动时动态获取站点
+        this.mapType = "BMAP_HYBRID_MAP" // 切换至混合地图
+        this.getSites() // 移动时动态获取站点
       }
     },
     // 获取地图当前缩放级别
@@ -279,13 +314,14 @@ export default {
       // alert(e.target.getZoom());
       this.zoom = e.target.getZoom();
       if (this.zoom >= this.scale) {
-        this.map_type = "BMAP_HYBRID_MAP" // 切换至混合地图
+        this.mapType = "BMAP_HYBRID_MAP" // 切换至混合地图
         this.getSites(); // 缩放时动态获取站点
       } else {
-        this.map_type = "BMAP_NORMAL_MAP"; // 切换至混合地图
-        this.markers = []; // 清空基站图标
+        this.mapType = "BMAP_NORMAL_MAP"
+        this.markers = [] // 清空基站图标
       }
     },
+    // 右键拾取坐标，并获取经纬度+地址信息
     async getCoord(e) {
       // 放大到16级时才允许拾取坐标系
       if (this.zoom < this.scale) {
@@ -293,13 +329,10 @@ export default {
       }
       this.coord.lng = e.point.lng;
       this.coord.lat = e.point.lat;
-      this.baiduReverseGeocoder(this.ak, this.coord.lng, this.coord.lat);
-      // console.log(this.address);
-      this.coord.label = "经纬度：" + this.coord.lng + ";" + this.coord.lat + "<br />地  址:" + this.address;
-      this.value = "当前经纬度:" + this.coord.lng + ";" + this.coord.lat; // 经纬度赋值到搜索框，用于粘贴
-    },
-    searchMap() {
-      // alert("hello");
+      await this.baiduReverseGeocoder(this.coord.lng, this.coord.lat);
+      console.log(this.address);
+      this.coord.label = "经纬度：" + this.coord.lng + ";" + this.coord.lat + "<br />地  址：" + this.address;
+      this.value = "当前经纬度：" + this.coord.lng + ";" + this.coord.lat; // 经纬度赋值到搜索框，用于粘贴
     },
     // 获取投诉数据
     getCompalins() {
@@ -315,22 +348,21 @@ export default {
         })
     },
     // =======请求百度地图web API获取详细POI==============
-    // =====2020年1月28日 19:49:57===================
+    // =====2020年4月1日 22:02:45===================
     // =====coordtype=bd09ll,extensions_poi=1=======
-    baiduReverseGeocoder(ak, lng, lat) {
-      reverseGeocoder(ak, lng, lat).then(response => {
-        console.log(response)
-      // // 请求成功
-      // var data = res.data.result;
-      // this.lng = data.location.lng; // 显示在底部cover-view
-      // this.lat = data.location.lat;
-      // this.town = data.addressComponent.town; // 乡镇、街道
-      // // console.log(this.town);
-      // var address = data.addressComponent.district + data.addressComponent.town; // 县市+乡镇/街道
-      // var poi = data.sematic_description.split(",")[0]; // poi，具体到小区或村庄
-      // this.address = address + poi;
-      })
-        .catch(response => {
+    async baiduReverseGeocoder(lng, lat) {
+      var url = 'http://api.map.baidu.com/reverse_geocoding/v3/?ak=' + this.ak + '&output=json&coordtype=bd09ll&ret_coordtype=bd09ll&extensions_poi=1&extensions_town=true&&location=' + lat + ',' + lng
+      await this.$jsonp(url)
+        .then(res => {
+          // console.log(res.result)
+          var data = res.result;
+          this.lng = data.location.lng; // 显示在底部cover-view
+          this.lat = data.location.lat;
+          this.town = data.addressComponent.town; // 乡镇、街道
+          // console.log(this.town);
+          var address = data.addressComponent.district + data.addressComponent.town; // 县市+乡镇/街道
+          var poi = data.sematic_description.split(",")[0]; // poi，具体到小区或村庄
+          this.address = address + poi;
         })
     },
 
@@ -365,11 +397,12 @@ export default {
     },
     // ====加载基站数据==========
     // =========================
-    getSites() {
+    async getSites() {
+      await this.baiduReverseGeocoder(this.lng, this.lat);
       var center = bd09towgs84(this.lng, this.lat)
       var lng = center[0]
       var lat = center[1]
-      getSite(this.town, lng, lat).then(response => {
+      await getSite(this.town, lng, lat).then(response => {
         // console.log(response)
         this.site_data = response.data
         this.showSites()
@@ -513,5 +546,10 @@ export default {
   }
   .el-icon-arrow-down {
     font-size: 12px;
+  }
+  .edit-complain{
+    font:bold;
+    color:red;
+    text-decoration: underline;
   }
 </style>

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import BaiduMap from 'vue-baidu-map' // 全局引入
+import VueJsonp from 'vue-jsonp'
 
 import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 
@@ -37,6 +38,8 @@ Vue.use(ElementUI)
 Vue.use(BaiduMap, {
   ak: 'U43Xy5aiHHDKWZwQOxPn7NS8kGdv8kFO'
 })
+// vue0jsonp
+Vue.use(VueJsonp)
 
 Vue.config.productionTip = false
 
