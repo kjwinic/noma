@@ -117,14 +117,14 @@ export const constantRoutes = [
     meta: { title: '基站退服', icon: 'example' },
     children: [
       {
-        path: 'falut-List',
-        name: 'falut-List',
+        path: 'falut-list',
+        name: 'Falut-list',
         component: () => import('@/views/fault/index'),
         meta: { title: '退服清单', icon: 'table' }
       },
       {
-        path: 'falut-List',
-        name: 'falut-List',
+        path: 'falut-analysis',
+        name: 'Falut-analysis',
         component: () => import('@/views/fault/index'),
         meta: { title: '分析报表', icon: 'analysis' }
       }
