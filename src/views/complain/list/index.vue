@@ -402,12 +402,12 @@
 </template>
 
 <script>
-// import { getList } from '@/api/table'
 import { getComplain, updateComplain, uploadComplain } from '@/api/complain.js'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { parseTime } from '@/utils'
 
 export default {
+  name: 'ComplainList',
   components: { Pagination },
   filters: {
     statusFilter(status) {
