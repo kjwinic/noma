@@ -89,19 +89,19 @@ export const constantRoutes = [
     children: [
       {
         path: 'complain-list',
-        name: 'Complain-list',
+        name: 'ComplainList',
         component: () => import('@/views/complain/list/index'),
         meta: { title: '投诉清单', icon: 'list' }
       },
       {
         path: 'complain-plan',
-        name: 'Complain-plan',
+        name: 'ComplainPlan',
         component: () => import('@/views/complain/plan/index'),
         meta: { title: '方案跟踪', icon: 'tracking' }
       },
       {
         path: 'complain-analysis',
-        name: 'Complain-analysis',
+        name: 'ComplainAnalysis',
         component: () => import('@/views/complain/analysis/index'),
         meta: { title: '分析报表', icon: 'analysis' }
       }
@@ -118,13 +118,13 @@ export const constantRoutes = [
     children: [
       {
         path: 'falut-list',
-        name: 'Falut-list',
+        name: 'FalutList',
         component: () => import('@/views/fault/index'),
         meta: { title: '退服清单', icon: 'table' }
       },
       {
         path: 'falut-analysis',
-        name: 'Falut-analysis',
+        name: 'FalutAnalysis',
         component: () => import('@/views/fault/index'),
         meta: { title: '分析报表', icon: 'analysis' }
       }
