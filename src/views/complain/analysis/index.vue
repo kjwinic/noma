@@ -166,7 +166,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 }, {})
 
 export default {
-  name: 'ComplexTable',
+  name: 'ComplainAnalysis',
   components: { Pagination },
   directives: { waves },
   filters: {

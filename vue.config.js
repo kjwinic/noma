@@ -6,7 +6,7 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || 'vue Admin Template' // page title
+const name = defaultSettings.title || '衢州移动网络运维可视化平台' // page title
 
 // If your port is set to 80,
 // use administrator privileges to execute the command line.
@@ -37,22 +37,22 @@ module.exports = {
       errors: true
     },
     proxy: {
-    //   // change xxx-api/login => mock/login
-    //   // detail: https://cli.vuejs.org/config/#devserver-proxy
-    //   // [process.env.VUE_APP_BASE_API+'/user/login']: {
-    //   //   target: `http://localhost:${port}/mock`,
-    //   //   changeOrigin: true,
-    //   //   pathRewrite: {
-    //   //     ['^'+process.env.VUE_APP_BASE_API]: ''
-    //   //   }
-    //   // },
-    //   [process.env.VUE_APP_BASE_API]:{
-    //     target: process.env.VUE_APP_BASE_API,
-    //     changeOrigin: true,
-    //     pathRewrite: {
-    //       ['^'+process.env.VUE_APP_BASE_API]: ''
-    //     }
-    //   }
+      //   // change xxx-api/login => mock/login
+      //   // detail: https://cli.vuejs.org/config/#devserver-proxy
+      //   // [process.env.VUE_APP_BASE_API+'/user/login']: {
+      //   //   target: `http://localhost:${port}/mock`,
+      //   //   changeOrigin: true,
+      //   //   pathRewrite: {
+      //   //     ['^'+process.env.VUE_APP_BASE_API]: ''
+      //   //   }
+      //   // },
+      //   [process.env.VUE_APP_BASE_API]:{
+      //     target: process.env.VUE_APP_BASE_API,
+      //     changeOrigin: true,
+      //     pathRewrite: {
+      //       ['^'+process.env.VUE_APP_BASE_API]: ''
+      //     }
+      //   }
       '/api': {
         target: 'http://api.map.baidu.com/',
         changeOrigin: true,
@@ -107,7 +107,7 @@ module.exports = {
       .end()
 
     config
-    // https://webpack.js.org/configuration/devtool/#development
+      // https://webpack.js.org/configuration/devtool/#development
       .when(process.env.NODE_ENV === 'development',
         config => config.devtool('cheap-source-map')
       )
@@ -119,7 +119,7 @@ module.exports = {
             .plugin('ScriptExtHtmlWebpackPlugin')
             .after('html')
             .use('script-ext-html-webpack-plugin', [{
-            // `runtime` must same as runtimeChunk name. default is `runtime`
+              // `runtime` must same as runtimeChunk name. default is `runtime`
               inline: /runtime\..*\.js$/
             }])
             .end()
