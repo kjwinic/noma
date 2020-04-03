@@ -80,9 +80,29 @@
       </bm-control>
       <!-- 自动填充搜索 -->
       <bm-control anchor="BMAP_ANCHOR_TOP_LEFT" :offset="{width: 660, height: 10}">
-        <bm-auto-complete v-model="keyword" :sug-style="{ zIndex: 5 }" @confirm="searchComplain">
-          <el-input v-model="keyword" size="mini" placeholder="搜索地点"></el-input>
-        </bm-auto-complete>
+        <!-- <bm-auto-complete
+          v-model="keyword_map"
+          :sug-style="{ zIndex: 5 }"
+          @confirm="searchComplain"
+        >-->
+        <!-- <el-input v-model="keyword" size="mini" placeholder="搜索地点"></el-input> -->
+        <el-autocomplete
+          v-model="keyword"
+          popper-class="my-autocomplete"
+          :fetch-suggestions="querySearch"
+          placeholder="输入搜索关键字"
+          size="mini"
+          :clearable="true"
+          @select="handleSelect"
+          @focus="searchComplain"
+        >
+          <i class="el-icon-edit el-input__icon" @click="handleIconClick"></i>
+          <template slot-scope="{ item }">
+            <div class="name">{{ item.value }}</div>
+            <span class="addr">{{ item.time }}</span>
+          </template>
+        </el-autocomplete>
+        <!-- </bm-auto-complete> -->
       </bm-control>
       <bm-local-search
         :localtion="center"
@@ -90,7 +110,7 @@
         :keyword="keyword"
         :auto-viewport="true"
       ></bm-local-search>
-      <!-- 搜索控件 -->
+      <!-- 搜索按钮 -->
       <bm-control anchor="BMAP_ANCHOR_TOP_LEFT" :offset="{width:840,height:10}">
         <el-button size="mini" type="primary" @click="handleSearch">搜索</el-button>
       </bm-control>
@@ -157,6 +177,20 @@
           ></bm-context-menu-item>
         </bm-context-menu>
       </bm-marker>
+      <!-- 加载搜索结果 -->
+      <bm-marker
+        v-for="marker2 in search_results"
+        :key="marker2.id"
+        :position="{lng: marker2.lng, lat: marker2.lat}"
+        :icon="marker2.icon"
+        animation="BMAP_ANIMATION_BOUNCE"
+      >
+        <bm-label
+          :content="marker2.label"
+          :label-style="{color: 'red', fontSize : '12px'}"
+          :offset="{width: -60, height: -40}"
+        />
+      </bm-marker>
       <!-- 加载投诉海量点 -->
       <bm-point-collection
         :points="complain_points"
@@ -193,7 +227,7 @@ import DistanceTool from "bmaplib.new-distancetool";
 // import { reverseGeocoder } from '@/api/bmap.js'
 import { getComplain } from "@/api/complain.js";
 import { getSite } from "@/api/site.js";
-import { bd09towgs84, wgs84tobd09 } from "@/utils/transformCoordinate.js";
+import { wgs84tobd09, bd09towgs84 } from "@/utils/transformCoordinate.js";
 
 export default {
   name: "Map",
@@ -282,9 +316,14 @@ export default {
         }
       ],
       search_type: "",
-      search_result: ""
+      search_results: [],
+      state2: ""
     };
   },
+  // mounted() {
+  //   // this.search_results = this.loadAll();
+  //   this.searchComplain(this.keyword);
+  // },
   unmount() {
     this.distanceTool && this.distanceTool.close();
   },
@@ -294,6 +333,28 @@ export default {
     // this.getCoord();
   },
   methods: {
+    querySearch(queryString, cb) {
+      var search_results = this.search_results;
+      var results = queryString
+        ? search_results.filter(this.createFilter(queryString))
+        : search_results;
+      // 调用 callback 返回建议列表的数据
+      cb(results);
+    },
+    createFilter(queryString) {
+      return restaurant => {
+        return (
+          restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
+      };
+    },
+    handleSelect(item) {
+      console.log(item);
+    },
+    handleIconClick(ev) {
+      console.log(ev);
+    },
     // //地图初始化
     // handler({
     // 	BMap,
@@ -345,6 +406,9 @@ export default {
     },
     handleSearch() {
       // console.log(e) // 为选中的value
+      if (this.keyword.length < 2) {
+        return;
+      }
       switch (this.search_type) {
         case "map":
           break;
@@ -361,8 +425,35 @@ export default {
       }
     },
     searchComplain(keyword) {
-      // this.keyword = "";
-      alert("搜索投诉" + keyword);
+      this.search_results = [];
+      this.listQuery.page = 1;
+      this.listQuery.limit = 20;
+      this.listQuery.address = keyword;
+      getComplain(this.listQuery)
+        .then(response => {
+          // console.log(response.data);
+          var data = response.data;
+          var len = data.length;
+          for (var i = 0; i < len; i++) {
+            console.log(data[i].lng);
+            var point = wgs84tobd09(data[i].lng, data[i].lat);
+            // console.log(point[0]);
+            this.search_results.push({
+              value: data[i].cp_info,
+              time: data[i].cp_time,
+              lng: point[0],
+              lat: point[1],
+              label: data[i].cp_info,
+              id: data[i].cp_id
+            });
+            // this.createMarker(point[0], point[1], "测试");
+          }
+          // this.search_results = response.data;
+          // this.loading = false;
+        })
+        .catch(response => {
+          // this.loading = false;
+        });
     },
     searchSite(keyword) {
       alert("搜索站点" + keyword);
@@ -372,18 +463,19 @@ export default {
       var arr = keyword.split(/,|，|;|；/);
       var lng = parseFloat(arr[0]); // 转换为float
       var lat = parseFloat(arr[1]);
+      var label = "当前经纬度：" + lng + ";" + lat;
       // 判断是否可以转换为float
       if (!lng & !lat) {
         this.list = [];
       } // 搜索结果为空
       this.center = { lng: lng, lat: lat }; // 设置地图中心
       this.zoom = 19;
-      this.createMarker(lng, lat); // 创建搜索结果点
+      this.createMarker(lng, lat, label); // 创建搜索结果点
     },
-    createMarker(lng, lat) {
+    createMarker(lng, lat, label) {
       this.coord.lng = lng;
       this.coord.lat = lat;
-      this.coord.label = "当前经纬度：" + lng + ";" + lat;
+      this.coord.label = label;
       // this.coord.icon = "/image/coord-point.png";
     },
     // 获取地图中心点坐标
@@ -617,7 +709,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 .map {
   padding-top: 30px;
 }
@@ -648,5 +740,22 @@ export default {
   font: bold;
   color: red;
   text-decoration: underline;
+}
+.my-autocomplete {
+  li {
+    line-height: normal;
+    padding: 7px;
+    .name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .addr {
+      font-size: 12px;
+      color: #b4b4b4;
+    }
+    .highlighted .addr {
+      color: #ddd;
+    }
+  }
 }
 </style>
