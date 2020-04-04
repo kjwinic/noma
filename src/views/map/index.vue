@@ -217,6 +217,14 @@
             :offset="{width: -60, height: -40}"
           />
         </bm-marker>
+        <bm-control anchor="BMAP_ANCHOR_TOP_RIGHT" :offset="{width:10,height:350}">
+          <el-button
+            type="success"
+            icon="el-icon-d-arrow-left"
+            circle
+            @mouseover.native="handleShow"
+          ></el-button>
+        </bm-control>
       </baidu-map>
     </div>
 
@@ -224,7 +232,7 @@
     <el-drawer
       :visible.sync="show_results"
       direction="rtl"
-      size="320px"
+      size="330px"
       :with-header="false"
       :modal="false"
       :before-close="handleClose"
@@ -372,6 +380,7 @@ export default {
           label: "搜索坐标"
         }
       ],
+      screenWidth: "",
       search_type: "",
       search_results: [],
       show_results: false,
@@ -379,10 +388,9 @@ export default {
       state2: ""
     };
   },
-  // mounted() {
-  //   // this.search_results = this.loadAll();
-  //   this.searchComplain(this.keyword);
-  // },
+  mounted() {
+    // this.screenWidth = document.body.clientWidth;
+  },
   unmount() {
     this.distanceTool && this.distanceTool.close();
   },
@@ -430,6 +438,7 @@ export default {
     // 处理下拉菜单
     handleCommand(command) {
       if (command === "a") {
+        this.initFilter();
         // 加载投诉数据
         this.getCompalins();
       }
@@ -458,6 +467,23 @@ export default {
       //   this.listQuery.address = this.keyword // 投诉地点搜索
       // }
     },
+    initFilter() {
+      this.select_date = "";
+      console.log(this.listQuery);
+      this.listQuery = {
+        page: 1,
+        limit: 0, // 每页显示数量
+        city: "",
+        user_tel: "",
+        is_solved: "",
+        is_overtime: "",
+        start_date: "",
+        end_date: "",
+        address: ""
+      };
+      console.log("清空后");
+      console.log(this.listQuery);
+    },
     // 下拉选择搜索类型
     selectSearch(e) {
       // console.log(e) // 为选中的value
@@ -485,6 +511,9 @@ export default {
     },
     handleClose() {
       this.show_results = false;
+    },
+    handleShow() {
+      this.show_results = true;
     },
     searchComplain(keyword) {
       this.show_results = true;
@@ -599,7 +628,7 @@ export default {
       this.loading = true;
       getComplain(this.listQuery)
         .then(response => {
-          // console.log(response.data)
+          console.log(response.data);
           this.complain_points = response.data;
           this.loading = false;
         })
@@ -881,7 +910,6 @@ h3.title {
   }
 
   .item {
-    margin: 5px;
     height: 28px;
     line-height: 28px;
     font-size: 14px;
@@ -924,13 +952,21 @@ h3.title {
       .list-scroll {
         margin-top: 10px;
         overflow-y: auto;
-        // min-height: 537px;
+        min-height: 537px;
         overflow-x: hidden;
+        scrollbar-face-color: seagreen;
+        scrollbar-arrow-color: skyblue;
 
         .row {
           float: left;
           width: 320px;
           cursor: pointer;
+          margin-top: 5px;
+          margin-left: 5px;
+          padding-top: 5px;
+          border: 1px solid #ebeef5;
+          border-radius: 5px;
+          box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 
           .head-title {
             overflow: hidden;
@@ -944,7 +980,7 @@ h3.title {
             line-height: 30px;
           }
           .row-second {
-            padding-left: 20px;
+            padding-left: 10px;
             font-size: 12px;
             padding-top: 5px;
           }
@@ -955,7 +991,7 @@ h3.title {
             // padding-bottom: 5px;
             font-size: 12px;
             color: rgb(128, 128, 128);
-            border-bottom: 1px solid #eee;
+            // border-bottom: 1px solid #eee;
             padding-left: 10px;
             line-height: 15px;
           }
