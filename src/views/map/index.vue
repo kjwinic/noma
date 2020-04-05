@@ -80,7 +80,7 @@
           </el-select>
         </bm-control>
         <!-- 自动填充搜索 -->
-        <bm-control anchor="BMAP_ANCHOR_TOP_LEFT" :offset="{width: 660, height: 10}">
+        <bm-control anchor="BMAP_ANCHOR_TOP_LEFT" :offset="{width: 650, height: 10}">
           <!-- <bm-auto-complete
           v-model="keyword_map"
           :sug-style="{ zIndex: 5 }"
@@ -467,6 +467,7 @@ export default {
       //   this.listQuery.address = this.keyword // 投诉地点搜索
       // }
     },
+    // 清空条件过滤
     initFilter() {
       this.select_date = "";
       console.log(this.listQuery);

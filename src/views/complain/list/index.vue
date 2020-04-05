@@ -93,7 +93,9 @@
           type="primary"
           icon="el-icon-upload"
         >批量导入</el-button>
-        <div slot="tip" class="el-upload__tip"><a :href="demo_download" download="无线投诉清单导入模板.xlsx">导入模板下载</a></div>
+        <div slot="tip" class="el-upload__tip">
+          <a :href="demo_download" download="无线投诉清单导入模板.xlsx">导入模板下载</a>
+        </div>
       </el-upload>
     </div>
 
@@ -402,20 +404,20 @@
 </template>
 
 <script>
-import { getComplain, updateComplain, uploadComplain } from '@/api/complain.js'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import { parseTime } from '@/utils'
+import { getComplain, updateComplain, uploadComplain } from "@/api/complain.js";
+import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import { parseTime } from "@/utils";
 
 export default {
-  name: 'ComplainList',
+  name: "ComplainList",
   components: { Pagination },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        是: 'success',
-        否: 'danger'
-      }
-      return statusMap[status]
+        是: "success",
+        否: "danger"
+      };
+      return statusMap[status];
     }
   },
   data() {
@@ -423,238 +425,291 @@ export default {
       pickerOptions: {
         shortcuts: [
           {
-            text: '最近一周',
+            text: "最近一周",
             onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-              picker.$emit('pick', [start, end])
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
             }
           },
           {
-            text: '最近一个月',
+            text: "最近一个月",
             onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-              picker.$emit('pick', [start, end])
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
             }
           },
           {
-            text: '最近三个月',
+            text: "最近三个月",
             onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-              picker.$emit('pick', [start, end])
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
             }
           }
         ]
       },
       value1: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
-      select_date: '', // 查询的日期区间
+      select_date: "", // 查询的日期区间
       list: null,
       listLoading: true,
       total: 0,
-      keyword: '', // 搜索关键字
+      keyword: "", // 搜索关键字
       fileList: [], // excel文件
       listQuery: {
         page: 1,
         limit: 10, // 每页显示数量
-        city: '',
-        user_tel: '',
-        is_solved: '',
-        is_overtime: '',
-        start_date: '',
-        end_date: '',
-        address: ''
+        city: "",
+        user_tel: "",
+        is_solved: "",
+        is_overtime: "",
+        start_date: "",
+        end_date: "",
+        address: ""
       },
-      citys: ['柯城', '衢江', '江山', '龙游', '常山', '开化', '外地'],
-      area: ['城区', '农村'],
-      area_type: ['商业区', '居民小区', '住宅区'],
-      cp_type: ['4G弱覆盖', '2G+4G弱覆盖', '2G弱覆盖', '设备故障', '无法确定'],
-      net_type: ['4G', '2G+4G', '2G'],
-      solve_type: ['规划', '优化', '不解决', '故障'],
-      yes_or_no: ['是', '否'],
+      citys: ["柯城", "衢江", "江山", "龙游", "常山", "开化", "外地"],
+      area: ["城区", "农村"],
+      area_type: ["商业区", "居民小区", "住宅区"],
+      cp_type: ["4G弱覆盖", "2G+4G弱覆盖", "2G弱覆盖", "设备故障", "无法确定"],
+      net_type: ["4G", "2G+4G", "2G"],
+      solve_type: ["规划", "优化", "不解决", "故障"],
+      yes_or_no: ["是", "否"],
       temp: {
-        cp_no: '',
-        city: ''
+        cp_no: "",
+        city: ""
       }, // 更新数据临时存储
       textMap: {
-        update: '投诉详单更新',
-        create: '创建投诉详单'
+        update: "投诉详单更新",
+        create: "创建投诉详单"
       },
       dialogFormVisible: false, // 控制对话框是否显示
-      dialogStatus: '', // 设置对话框是update还是create
-      demo_download: './static/complain.xlsx' // 导入模板地址
-    }
+      dialogStatus: "", // 设置对话框是update还是create
+      demo_download: "./static/complain.xlsx" // 导入模板地址
+    };
   },
   created() {
     // this.fetchData()
-    this.getComplainList()
+    this.getComplainList();
   },
   methods: {
     // 获取用户投诉详单
     getComplainList() {
-      this.listLoading = true
+      this.listLoading = true;
       getComplain(this.listQuery).then(response => {
         // console.log(response.total)
-        this.list = response.data
-        this.total = response.total
-        this.listLoading = false
-      })
+        this.list = response.data;
+        this.total = response.total;
+        this.listLoading = false;
+      });
     },
-    // 搜索
+    // 条件过滤
     handleFilter() {
-      this.listQuery.page = 1
+      this.listQuery.page = 1;
       if (this.checkMobile(this.keyword)) {
         // 搜索为用户号码
-        this.listQuery.user_tel = this.keyword // 用户号码搜索
+        this.listQuery.user_tel = this.keyword; // 用户号码搜索
       } else {
-        this.listQuery.address = this.keyword // 投诉地点搜索
+        this.listQuery.address = this.keyword; // 投诉地点搜索
       }
-      this.listQuery.start_date = this.select_date[0]
-      this.listQuery.end_date = this.select_date[1]
-      this.getComplainList()
+      this.listQuery.start_date = this.select_date[0];
+      this.listQuery.end_date = this.select_date[1];
+      this.getComplainList();
     },
     // 校验手机号码
     checkMobile(tel) {
-      var r = RegExp(/^1(3|4|5|7|8|9)\d{9}$/).test(tel)
+      var r = RegExp(/^1(3|4|5|7|8|9)\d{9}$/).test(tel);
       if (!r) {
-        return false
+        return false;
       } else {
-        return true
+        return true;
       }
     },
     // 清空筛选
     handleClear() {
-      this.listQuery.city = ''
-      this.listQuery.is_solved = ''
-      this.listQuery.is_overtime = ''
-      this.listQuery.user_tel = ''
-      this.listQuery.address = ''
-      this.listQuery.start_date = ''
-      this.listQuery.end_date = ''
-      this.getComplainList()
+      this.select_date = "";
+      this.listQuery.city = "";
+      this.listQuery.is_solved = "";
+      this.listQuery.is_overtime = "";
+      this.listQuery.user_tel = "";
+      this.listQuery.address = "";
+      this.listQuery.start_date = "";
+      this.listQuery.end_date = "";
+      this.getComplainList();
     },
     // 编辑
     handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
+      this.temp = Object.assign({}, row); // copy obj
+      this.temp.timestamp = new Date(this.temp.timestamp);
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
       this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
+        this.$refs["dataForm"].clearValidate();
+      });
     },
     // 取消按钮
     cancelUpdate() {
-      this.$confirm('是否确认退出?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
+      this.$confirm("是否确认退出?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
         center: true
       })
         .then(() => {
-          this.dialogFormVisible = false
+          this.dialogFormVisible = false;
         })
-        .catch(() => {})
+        .catch(() => {});
     },
     // 更新数据
     updateData() {
-      this.$refs['dataForm'].validate(valid => {
+      this.$refs["dataForm"].validate(valid => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp)
+          const tempData = Object.assign({}, this.temp);
           // console.log(tempData)
           updateComplain(tempData.cp_id, tempData).then(() => {
             // const index = this.list.findIndex(v => v.id === this.temp.id)
             // this.list.splice(index, 1, this.temp)
-            this.dialogFormVisible = false
+            this.dialogFormVisible = false;
             this.$notify({
-              title: '提醒',
-              message: '更新成功',
-              type: 'success',
+              title: "提醒",
+              message: "更新成功",
+              type: "success",
               duration: 2000
-            })
-          })
+            });
+          });
         }
-      })
+      });
     },
     // excel上传
     uploadExcel(item) {
-      const fileObj = item.file
+      const fileObj = item.file;
       // console.log(fileObj)
-      const form = new FormData()
-      form.append('file', fileObj) // 文件对象 'file'为后端接收参数
+      const form = new FormData();
+      form.append("file", fileObj); // 文件对象 'file'为后端接收参数
       // console.log(form)
       uploadComplain(form)
         .then(response => {
           // console.log(response)
           if (response.code === 20000) {
             this.$notify({
-              title: '提醒',
-              message: '上传成功',
-              type: 'success',
+              title: "提醒",
+              message: "上传成功",
+              type: "success",
               duration: 2000
-            })
-            this.getComplainList()
+            });
+            this.getComplainList();
           }
         })
         .catch(response => {
           this.$notify({
-            title: '提醒',
-            message: '上传失败',
-            type: 'error',
+            title: "提醒",
+            message: "上传失败",
+            type: "error",
             duration: 2000
-          })
-        })
+          });
+        });
     },
     // 文件上传前检测
     beforeUpload(file) {
-      const file_type = file.name.split('.')[1]
-      const size = file.size / 1024 / 1024
-      if (file_type !== 'xlsx' && file_type !== 'xls') {
+      const file_type = file.name.split(".")[1];
+      const size = file.size / 1024 / 1024;
+      if (file_type !== "xlsx" && file_type !== "xls") {
         this.$notify.warning({
-          title: '警告',
+          title: "警告",
           message: `只能上传xlsx、xls格式文件`
-        })
+        });
       }
       if (size > 1) {
         this.$notify.warning({
-          title: '警告',
+          title: "警告",
           message: `文件大小不能超过1M`
-        })
+        });
       }
     },
     // 批量导出
     handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['流水号', '受理时间', '用户号码', '终端型号', '用户星级', '县市', '投诉区域', '区域分类', '投诉内容', '处理过程', '原因分类', '乡镇', '投诉地点', '方案类别', '解决方案', '方案进度', '最新进展', '是否解决', '是否超期', '解决期限', '预计解决时间', '实际解决时间', '经度', '纬度']
-        const filterVal = ['cp_no', 'cp_time', 'user_tel', 'phone_type', 'user_star', 'city', 'area', 'area_type', 'cp_info', 'deal_info', 'cp_type', 'town', 'address', 'solve_type', 'solve_plan', 'plan_progres', 'tracking_info', 'is_solved', 'is_overtime', 'deal_duration', 'plan_time', 'deal_time', 'lng', 'lat']
-        const list = this.list
-        const data = this.formatJson(filterVal, list)
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then(excel => {
+        const tHeader = [
+          "流水号",
+          "受理时间",
+          "用户号码",
+          "终端型号",
+          "用户星级",
+          "县市",
+          "投诉区域",
+          "区域分类",
+          "投诉内容",
+          "处理过程",
+          "原因分类",
+          "乡镇",
+          "投诉地点",
+          "方案类别",
+          "解决方案",
+          "方案进度",
+          "最新进展",
+          "是否解决",
+          "是否超期",
+          "解决期限",
+          "预计解决时间",
+          "实际解决时间",
+          "经度",
+          "纬度"
+        ];
+        const filterVal = [
+          "cp_no",
+          "cp_time",
+          "user_tel",
+          "phone_type",
+          "user_star",
+          "city",
+          "area",
+          "area_type",
+          "cp_info",
+          "deal_info",
+          "cp_type",
+          "town",
+          "address",
+          "solve_type",
+          "solve_plan",
+          "plan_progres",
+          "tracking_info",
+          "is_solved",
+          "is_overtime",
+          "deal_duration",
+          "plan_time",
+          "deal_time",
+          "lng",
+          "lat"
+        ];
+        const list = this.list;
+        const data = this.formatJson(filterVal, list);
         excel.export_json_to_excel({
           header: tHeader,
           data,
           filename: this.filename,
           autoWidth: this.autoWidth,
           bookType: this.bookType
-        })
-        this.downloadLoading = false
-      })
+        });
+        this.downloadLoading = false;
+      });
     },
     formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
+      return jsonData.map(v =>
+        filterVal.map(j => {
+          if (j === "timestamp") {
+            return parseTime(v[j]);
+          } else {
+            return v[j];
+          }
+        })
+      );
     }
   }
-}
+};
 </script>
 <style lang="scss">
 .el-tooltip__popper {
@@ -691,11 +746,11 @@ export default {
 .upload {
   display: flex;
 }
-.el-upload__tip{
+.el-upload__tip {
   align-items: center;
   text-decoration: underline;
 }
-.app-container{
+.app-container {
   padding-top: 40px;
 }
 </style>
