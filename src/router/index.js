@@ -114,7 +114,7 @@ export const constantRoutes = [
     alwaysShow: true,
     redirect: '/fault',
     name: 'Fault',
-    meta: { title: '基站退服', icon: 'example' },
+    meta: { title: '基站退服', icon: 'site' },
     children: [
       {
         path: 'falut-list',

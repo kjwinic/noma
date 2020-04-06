@@ -1,49 +1,5 @@
 <template>
   <div class="app-container">
-    <!-- <el-form ref="form" :model="form" label-width="120px">
-      <el-form-item label="Activity name">
-        <el-input v-model="form.name" />
-      </el-form-item>
-      <el-form-item label="Activity zone">
-        <el-select v-model="form.region" placeholder="please select your zone">
-          <el-option label="Zone one" value="shanghai" />
-          <el-option label="Zone two" value="beijing" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="Activity time">
-        <el-col :span="11">
-          <el-date-picker v-model="form.date1" type="date" placeholder="Pick a date" style="width: 100%;" />
-        </el-col>
-        <el-col :span="2" class="line">-</el-col>
-        <el-col :span="11">
-          <el-time-picker v-model="form.date2" type="fixed-time" placeholder="Pick a time" style="width: 100%;" />
-        </el-col>
-      </el-form-item>
-      <el-form-item label="Instant delivery">
-        <el-switch v-model="form.delivery" />
-      </el-form-item>
-      <el-form-item label="Activity type">
-        <el-checkbox-group v-model="form.type">
-          <el-checkbox label="Online activities" name="type" />
-          <el-checkbox label="Promotion activities" name="type" />
-          <el-checkbox label="Offline activities" name="type" />
-          <el-checkbox label="Simple brand exposure" name="type" />
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="Resources">
-        <el-radio-group v-model="form.resource">
-          <el-radio label="Sponsor" />
-          <el-radio label="Venue" />
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="Activity form">
-        <el-input v-model="form.desc" type="textarea" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">Create</el-button>
-        <el-button @click="onCancel">Cancel</el-button>
-      </el-form-item>
-    </el-form>-->
     <el-container>
       <el-header class="top-step">
         <el-steps :active="active" align-center finish-status="success">
@@ -61,7 +17,7 @@
             v-model="select_date"
             format="yyyy 年 MM 月 dd 日"
             value-format="yyyy-MM-dd"
-            unlink-panels="true"
+            :unlink-panels="true"
             type="datetimerange"
             :picker-options="pickerOptions"
             range-separator="至"
@@ -144,12 +100,14 @@
         <!-- 表格部分 -->
         <div class="table">
           <el-table
+            v-loading="listLoading"
             :data="tableData"
             border
             style="width: 100%"
             highlight-current-row
             :row-class-name="tableRowClassName"
             max-height="500"
+            @row-dblclick="showProcess"
           >
             <!-- <el-table-column label="序号" align="center" width="80">
               <template slot-scope="{row}">{{ row.plan_id }}</template>
@@ -157,13 +115,7 @@
             <el-table-column fixed label="县市" width="80" align="center">
               <template slot-scope="{row}">{{ row.city }}</template>
             </el-table-column>
-            <el-table-column
-              fixed
-              label="方案名称"
-              width="150"
-              align="center"
-              show-overflow-tooltip="true"
-            >
+            <el-table-column label="方案名称" width="150" align="center" :show-overflow-tooltip="true">
               <template slot-scope="{row}">{{ row.plan_name }}</template>
             </el-table-column>
             <el-table-column
@@ -171,32 +123,37 @@
               label="投诉区域"
               width="100"
               align="center"
-              show-overflow-tooltip="true"
+              :show-overflow-tooltip="true"
             >
               <template slot-scope="{row}">{{ row.address }}</template>
             </el-table-column>
             <el-table-column fixed label="投诉次数" width="80" align="center">
               <template slot-scope="{row}">{{ row.count }}</template>
             </el-table-column>
-            <el-table-column label="录入时间" width="120" align="center" show-overflow-tooltip="true">
+            <el-table-column label="录入时间" width="120" align="center" :show-overflow-tooltip="true">
               <template slot-scope="{row}">{{ row.plan_record_date }}</template>
             </el-table-column>
-            <el-table-column label="确认方案时间" width="120" align="center" show-overflow-tooltip="true">
+            <el-table-column
+              label="确认方案时间"
+              width="120"
+              align="center"
+              :show-overflow-tooltip="true"
+            >
               <template slot-scope="{row}">{{ row.plan_confirm_date }}</template>
             </el-table-column>
-            <el-table-column label="规划编号" width="100" align="center" show-overflow-tooltip="true">
+            <el-table-column label="规划编号" width="100" align="center" :show-overflow-tooltip="true">
               <template slot-scope="{row}">{{ row.plan_no }}</template>
             </el-table-column>
-            <el-table-column label="所属规模" width="110" align="center" show-overflow-tooltip="true">
+            <el-table-column label="所属规模" width="110" align="center" :show-overflow-tooltip="true">
               <template slot-scope="{row}">{{ row.project }}</template>
             </el-table-column>
-            <el-table-column label="拍照站名" width="110" align="center" show-overflow-tooltip="true">
+            <el-table-column label="拍照站名" width="110" align="center" :show-overflow-tooltip="true">
               <template slot-scope="{row}">{{ row.site_name }}</template>
             </el-table-column>
             <el-table-column label="站点类型" width="50" align="center">
               <template slot-scope="{row}">{{ row.site_type }}</template>
             </el-table-column>
-            <el-table-column label="设备来源" width="50" align="center" show-overflow-tooltip="true">
+            <el-table-column label="设备来源" width="50" align="center" :show-overflow-tooltip="true">
               <template slot-scope="{row}">{{ row.equipment_from }}</template>
             </el-table-column>
             <el-table-column label="建设单位" width="50" align="center">
@@ -208,19 +165,35 @@
             <el-table-column label="网络类型" width="80" align="center">
               <template slot-scope="{row}">{{ row.net_type }}</template>
             </el-table-column>
-            <el-table-column label="提交工程时间" width="120" align="center" show-overflow-tooltip="true">
+            <el-table-column
+              label="提交工程时间"
+              width="120"
+              align="center"
+              :show-overflow-tooltip="true"
+            >
               <template slot-scope="{row}">{{ row.submit_date }}</template>
             </el-table-column>
             <el-table-column label="方案时限" width="50" align="center">
               <template slot-scope="{row}">{{ row.plan_limit }}</template>
             </el-table-column>
-            <el-table-column label="计划开通时间" width="120" align="center" show-overflow-tooltip="true">
+            <el-table-column
+              label="计划开通时间"
+              width="120"
+              align="center"
+              :show-overflow-tooltip="true"
+            >
               <template slot-scope="{row}">{{ row.plan_done_date }}</template>
             </el-table-column>
-            <el-table-column label="当前环节" width="80" align="center">
+            <el-table-column fixed label="当前环节" width="80" align="center">
               <template slot-scope="{row}">{{ row.current_process }}</template>
             </el-table-column>
-            <el-table-column label="当前进度详情" width="150" align="center" show-overflow-tooltip="true">
+            <el-table-column
+              fixed
+              label="当前进度详情"
+              width="150"
+              align="center"
+              :show-overflow-tooltip="true"
+            >
               <template slot-scope="{row}">{{ row.process_detail }}</template>
             </el-table-column>
             <el-table-column label="实际开通时间" width="120" align="center">
@@ -237,22 +210,34 @@
                 <span v-else>{{ row.finish_date }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="截至当前历时" width="80" align="center">
-              <template slot-scope="{row}">{{ row.current_duration }}</template>
+            <el-table-column fixed label="截至当前历时" width="80" align="center">
+              <template slot-scope="{row}">{{ row.current_duration }}天</template>
             </el-table-column>
             <el-table-column label="是否超期" width="50" align="center">
               <template slot-scope="{row}">{{ row.is_overtime }}</template>
             </el-table-column>
-            <el-table-column label="超期天数" width="50" align="center">
-              <template slot-scope="{row}">{{ row.overtime_days }}</template>
+            <el-table-column label="超期天数" width="80" align="center">
+              <template slot-scope="{row}">{{ row.overtime_days }}天</template>
             </el-table-column>
             <el-table-column label="是否解决" width="80" align="center" class-name="status-col">
               <template slot-scope="{row}">
-                <el-tag :type="row.is_solved | statusFilter">{{ row.is_solved }}</el-tag>
+                <template v-if="row.edit">
+                  <el-select v-model="row.is_solved" size="mini" class="filter-item">
+                    <el-option v-for="item in yes_or_no" :key="item" :label="item" :value="item" />
+                  </el-select>
+                </template>
+                <span v-else>
+                  <el-tag :type="row.is_solved | statusFilter">{{ row.is_solved }}</el-tag>
+                </span>
               </template>
             </el-table-column>
-            <el-table-column label="责任人" width="80" align="center">
-              <template slot-scope="{row}">{{ row.duty_user }}</template>
+            <el-table-column label="责任人" width="100" align="center">
+              <template slot-scope="{row}">
+                <template v-if="row.edit">
+                  <el-input v-model="row.duty_user" class="edit-input" size="small" />
+                </template>
+                <span v-else>{{ row.duty_user }}</span>
+              </template>
             </el-table-column>
             <el-table-column label="记录更新人" width="100" align="center">
               <template slot-scope="{row}">{{ row.update_user }}</template>
@@ -263,36 +248,89 @@
             <el-table-column label="备注" width="200" align="center">
               <template slot-scope="{row}">
                 <template v-if="row.edit">
-                  <el-input v-model="row.remark" class="edit-input" size="small" />
+                  <el-input
+                    v-model="row.remark"
+                    type="textarea"
+                    autosize
+                    class="edit-input"
+                    size="normal"
+                  />
                 </template>
                 <span v-else>{{ row.remark }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="80" align="center">
+            <el-table-column label="操作" width="200" align="center" fixed="right">
               <template slot-scope="{row}">
                 <el-button
                   v-if="row.edit"
                   type="success"
-                  size="small"
-                  icon="el-icon-circle-check-outline"
+                  size="mini"
+                  icon="el-icon-check"
                   @click="confirmEdit(row)"
                 >确认</el-button>
                 <el-button
                   v-else
                   type="primary"
-                  size="small"
+                  size="mini"
                   icon="el-icon-edit"
                   @click="edit(row)"
                 >编辑</el-button>
+                <el-button type="danger" size="mini" icon="el-icon-phone">提醒</el-button>
               </template>
             </el-table-column>
-            <el-table-column class-name="status-col" label="查看流程" width="80" align="center">
-              <i class="el-icon-view" />
+            <el-table-column
+              class-name="status-col"
+              label="进度跟踪"
+              width="50"
+              align="center"
+              fixed="right"
+            >
+              <template slot-scope="{row}">
+                <el-popover
+                  placement="left-start"
+                  :title="row.plan_name"
+                  width="500"
+                  trigger="click"
+                >
+                  <el-timeline>
+                    <el-timeline-item
+                      v-for="(item, index) in trackingData"
+                      :key="index"
+                      :color="item.color"
+                      :timestamp="item.timestamp"
+                      placement="top"
+                    >
+                      <el-card>
+                        <span class="pop-user">{{ item.user }}</span>
+                        更新进度： {{ item.content }}预计完成时间：{{ item.date }}，责任人：{{ item.user }}
+                      </el-card>
+                    </el-timeline-item>
+                    <span v-if="!trackingTotal">暂无跟踪信息</span>
+                    <el-pagination
+                      v-show="trackingTotal>0"
+                      small
+                      layout="prev, pager, next"
+                      :total="trackingTotal"
+                      :current-page.sync="trackingQuery.page"
+                      :page-size.sync="trackingQuery.limit"
+                      @current-change="handleCurrentChange"
+                    />
+                  </el-timeline>
+                  <el-button
+                    slot="reference"
+                    type="warning"
+                    icon="el-icon-view"
+                    size="mini"
+                    circle
+                    @click="getPlanTracking(row)"
+                  ></el-button>
+                </el-popover>
+              </template>
             </el-table-column>
           </el-table>
         </div>
         <!-- 分页 -->
-        <div>
+        <div class="pagination">
           <pagination
             v-show="total>0"
             :total="total"
@@ -307,7 +345,11 @@
 </template>
 
 <script>
-import { getComplainPlan } from "@/api/complain.js";
+import {
+  getComplainPlan,
+  updateComplainPlan,
+  getComplainPlanTracking
+} from "@/api/complain.js";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 
 export default {
@@ -387,16 +429,22 @@ export default {
       dialogFormVisible: false, // 控制对话框是否显示
       dialogStatus: "", // 设置对话框是update还是create
       // demo_download: "static/complain.xlsx", // 导入模板地址
-      form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: ""
-      }
+      trackingQuery: {
+        // 方案流程跟踪查询参数
+        page: 1,
+        limit: 3, // 每页显示数量
+        plan_id: ""
+      },
+      rowDate: "",
+      trackingTotal: 0,
+      trackingData: [
+        {
+          content: "详情",
+          timestamp: "2020-04-06 21:47:19",
+          color: "#0bbd87",
+          user: "张三"
+        }
+      ]
     };
   },
   mounted() {
@@ -407,27 +455,29 @@ export default {
   },
   methods: {
     // 获取用户投诉解决方案详单
+    // getComplainPlanList() {
+    //   this.listLoading = true;
+    //   getComplainPlan(this.listQuery).then(response => {
+    //     console.log(response.total);
+    //     this.tableData = response.data;
+    //     this.total = response.total;
+    //     this.listLoading = false;
+    //   });
+    // },
     getComplainPlanList() {
       this.listLoading = true;
       getComplainPlan(this.listQuery).then(response => {
-        console.log(response.total);
-        this.tableData = response.data;
+        // console.log(response.data);
+        const items = response.data;
+        this.tableData = items.map(v => {
+          this.$set(v, "edit", false); // https://vuejs.org/v2/guide/reactivity.html
+          // v.original = v.remarks; //  will be used when user click the cancel botton
+          return v;
+        });
         this.total = response.total;
         this.listLoading = false;
       });
     },
-    // async getComplainPlanList() {
-    //   this.listLoading = true;
-    //   const { data } = await getComplainPlan(this.listQuery);
-    //   const items = data.items;
-    //   console.log(items);
-    //   this.tableData = items.map(v => {
-    //     this.$set(v, "edit", false); // https://vuejs.org/v2/guide/reactivity.html
-    //     v.originalTitle = v.title; //  will be used when user click the cancel botton
-    //     return v;
-    //   });
-    //   this.listLoading = false;
-    // },
     // 条件过滤
     handleFilter() {
       this.listQuery.page = 1;
@@ -469,27 +519,69 @@ export default {
     edit(row) {
       // row.title = row.originalTitle;
       row.edit = true;
+      // alert(row.plan_id);
       this.$message({
-        message: "edit",
+        message: "开启编辑",
         type: "warning"
       });
     },
+    // 确认更新
     confirmEdit(row) {
       row.edit = false;
       // row.originalTitle = row.title;
-      this.$message({
-        message: "The title has been edited",
-        type: "success"
+      const data = { remark: row.remark, update_user: "管理员" };
+      updateComplainPlan(row.plan_id, data)
+        .then(res => {
+          // console.log(res);
+          this.$notify({
+            title: "提示",
+            message: "更新成功",
+            type: "success",
+            duration: 2000
+          });
+        })
+        .catch(res => {
+          this.$notify({
+            title: "提醒",
+            message: "更新失败",
+            type: "error",
+            duration: 2000
+          });
+        });
+    },
+    // 查看方案跟踪流程
+    getPlanTracking(row) {
+      // alert(row.plan_name + "流程跟踪");
+      this.rowData = row;
+      this.trackingData = [];
+      this.trackingQuery.plan_id = row.plan_id;
+      getComplainPlanTracking(this.trackingQuery).then(response => {
+        // console.log(response.data);
+        var data = response.data;
+        var len = data.length;
+        for (var i = 0; i < len; i++) {
+          this.trackingData.push({
+            content: data[i].tracking_info,
+            timestamp: data[i].update_time,
+            user: data[i].update_user,
+            date: data[i].expected_time
+          });
+        }
+        this.trackingTotal = response.total;
+        this.trackingData[0].color = "#0bbd87"; // 最新的进度绿色图标
+        // this.$set(this.trackingData[i], "color", "#0bbd87");
       });
     },
-    onSubmit() {
-      this.$message("submit!");
+    handleCurrentChange(val) {
+      // alert(`当前页: ${val}`);
+      this.$forceUpdate();
+      this.trackingQuery.page = val;
+      this.getComplainPlanTracking(this.rowData);
     },
-    onCancel() {
-      this.$message({
-        message: "cancel!",
-        type: "warning"
-      });
+    // 双击某一行，同步呈现进度步骤条
+    showProcess(e) {
+      // alert(row.plan_name);
+      alert(e.current_process);
     }
   }
 };
@@ -534,6 +626,20 @@ export default {
 }
 .pagination-container {
   padding: 16px;
+  float: right;
+}
+.edit-input {
+  padding-right: 0px;
+}
+.el-main {
+  padding: 10px;
+}
+.pop-user {
+  /* font-weight: bold; */
+  color: #409eff;
+}
+.el-timeline {
+  padding: 0px 10px;
 }
 </style>
 

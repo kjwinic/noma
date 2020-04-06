@@ -187,7 +187,7 @@
         >
           <bm-label
             :content="marker2.label"
-            :label-style="{color: 'red', fontSize : '12px'}"
+            :label-style="labelStyle"
             :offset="{width: -60, height: -40}"
           />
         </bm-marker>
@@ -329,6 +329,14 @@ export default {
       markers: [],
       keyword: "",
       value: "搜索地图",
+      labelStyle: {
+        // 标签样式
+        padding: "10px",
+        color: "gray",
+        fontSize: "12px",
+        border: "1px solid #ccc",
+        borderRadius: "5px"
+      },
       infoWindow: {
         position: {
           lng: 0,

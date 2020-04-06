@@ -166,7 +166,7 @@
             @click="handleDelete(scope.row.cp_id, scope.row)"
           >
           删除 </el-button>-->
-          <el-button size="mini" type="success" @click="handleUpdate(scope.row)">更新</el-button>
+          <el-button size="mini" type="primary" @click="handleUpdate(scope.row)">编辑</el-button>
         </template>
       </el-table-column>
       <el-table-column class-name="status-col" label="地图查看" width="80" align="center">
