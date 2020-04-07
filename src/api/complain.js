@@ -55,3 +55,11 @@ export function getComplainPlanTracking(query) {
     params: query
   })
 }
+export function postComplainPlanTracking(data) {
+  return request({
+    url: 'http://127.0.0.1:5000/noma/api/v1/complainplantrackings',
+    method: 'post',
+    data
+  })
+}
+

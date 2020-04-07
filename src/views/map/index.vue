@@ -257,14 +257,27 @@
                       @click="viewMarker(item)"
                     >
                       <div class="head-title" :title="item.name" v-text="item.name"></div>
-                      <div class="row-second">{{ item.time }}</div>
-                      <div class="row-second">{{ item.user_tel }}</div>
-                      <div
-                        class="row-second"
-                      >经纬度：{{ item.lng.toFixed(6) }};{{ item.lat.toFixed(6) }}</div>
-                      <div class="row-second">{{ item.cp_type }}</div>
+                      <div class="row-second">
+                        <i class="el-icon-date"></i>
+                        {{ item.time }}
+                      </div>
+                      <div class="row-second">
+                        <i class="el-icon-phone-outline"></i>
+                        {{ item.user_tel }}
+                      </div>
+                      <div class="row-second">
+                        <i class="el-icon-place"></i>
+                        经纬度：{{ item.lng.toFixed(6) }} ; {{ item.lat.toFixed(6) }}
+                      </div>
+                      <div class="row-second">
+                        <i class="el-icon-price-tag"></i>
+                        {{ item.cp_type }}
+                      </div>
                       <div class="row-content">
-                        <span class="item fl">{{ item.solve_plan }}</span>
+                        <span class="item fl">
+                          <i class="el-icon-paperclip"></i>
+                          {{ item.solve_plan }}
+                        </span>
                         <span class="item fl2">
                           <i
                             :class="[item.is_solved=='否'?'el-icon-close':'el-icon-check']"
@@ -1007,7 +1020,7 @@ h3.title {
         }
 
         .row.active {
-          background-color: #e1f3d8;
+          background-color: #62adf8;
         }
       }
     }

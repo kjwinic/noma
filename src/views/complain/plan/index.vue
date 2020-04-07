@@ -30,7 +30,7 @@
           <el-select
             v-model="listQuery.city"
             placeholder="县市"
-            clearable
+            :clearable="true"
             style="width: 90px"
             size="mini"
             class="filter-item"
@@ -41,7 +41,7 @@
           <el-select
             v-model="listQuery.is_solved"
             placeholder="是否解决"
-            clearable
+            :clearable="true"
             style="width: 100px"
             size="mini"
             class="filter-item"
@@ -52,7 +52,7 @@
           <el-select
             v-model="listQuery.is_overtime"
             placeholder="是否超期"
-            clearable
+            :clearable="true"
             style="width: 100px"
             size="mini"
             class="filter-item"
@@ -67,12 +67,11 @@
             style="width: 230px;"
             size="mini"
             class="filter-item"
-            clearable="true"
+            :clearable="true"
             @keyup.enter.native="handleFilter"
             @change="handleFilter"
           />
           <el-button
-            v-waves
             class="filter-item"
             type="primary"
             icon="el-icon-search"
@@ -88,7 +87,6 @@
             @click="handleClear"
           >清空筛选</el-button>
           <el-button
-            v-waves
             :loading="downloadLoading"
             class="filter-item"
             type="primary"
@@ -242,7 +240,7 @@
             <el-table-column label="记录更新人" width="100" align="center">
               <template slot-scope="{row}">{{ row.update_user }}</template>
             </el-table-column>
-            <el-table-column label="更新时间" width="110" align="center">
+            <el-table-column label="更新时间" width="110" align="center" :show-overflow-tooltip="true">
               <template slot-scope="{row}">{{ row.update_time }}</template>
             </el-table-column>
             <el-table-column label="备注" width="200" align="center">
@@ -281,41 +279,56 @@
             <el-table-column
               class-name="status-col"
               label="进度跟踪"
-              width="50"
+              width="150"
               align="center"
               fixed="right"
             >
               <template slot-scope="{row}">
+                <el-button
+                  type="success"
+                  icon="el-icon-thumb"
+                  size="mini"
+                  circle
+                  @click="handleCreate(row)"
+                ></el-button>
                 <el-popover
                   placement="left-start"
                   :title="row.plan_name"
                   width="500"
                   trigger="click"
                 >
-                  <el-timeline>
+                  <el-timeline :reverse="reverse">
                     <el-timeline-item
                       v-for="(item, index) in trackingData"
                       :key="index"
                       :color="item.color"
-                      :timestamp="item.timestamp"
+                      :timestamp="item.update_time"
                       placement="top"
                     >
                       <el-card>
-                        <span class="pop-user">{{ item.user }}</span>
-                        更新进度： {{ item.content }}预计完成时间：{{ item.date }}，责任人：{{ item.user }}
+                        <span class="pop-user">{{ item.update_user }}</span>
+                        更新进度： {{ item.tracking_info }}
+                        <p class="pop-p">
+                          <i class="el-icon-user"></i>
+                          当前环节责任人：{{ item.duty_user }}{{ item.short_tel }}，预计完成时间：{{ item.current_expected_time }}
+                        </p>
+                        <p class="pop-p">
+                          <i class="el-icon-date"></i>
+                          预计方案整体完成时间：{{ item.recent_plan_time }}
+                        </p>
                       </el-card>
                     </el-timeline-item>
                     <span v-if="!trackingTotal">暂无跟踪信息</span>
-                    <el-pagination
-                      v-show="trackingTotal>0"
-                      small
-                      layout="prev, pager, next"
-                      :total="trackingTotal"
-                      :current-page.sync="trackingQuery.page"
-                      :page-size.sync="trackingQuery.limit"
-                      @current-change="handleCurrentChange"
-                    />
                   </el-timeline>
+                  <el-pagination
+                    v-show="trackingTotal>0"
+                    small
+                    layout="prev, pager, next"
+                    :total="trackingTotal"
+                    :current-page.sync="trackingQuery.page"
+                    :page-size.sync="trackingQuery.limit"
+                    @current-change="handleCurrentChange"
+                  />
                   <el-button
                     slot="reference"
                     type="warning"
@@ -340,6 +353,85 @@
           />
         </div>
       </el-main>
+      <!-- 对话弹出框 -->
+      <el-dialog
+        :title="textMap[dialogStatus]"
+        :visible.sync="dialogFormVisible"
+        center
+        width="30%"
+        top="5vh"
+        :before-close="cancelUpdate"
+        class="my"
+      >
+        <el-card>
+          <el-form
+            ref="ruleForm"
+            :rules="rules"
+            :model="ruleForm"
+            label-width="120px"
+            label-position="right"
+            size="mini"
+          >
+            <el-form-item label="方案名称">
+              <el-input v-model="ruleForm.plan_name" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="关联投诉区域">
+              <el-input v-model="ruleForm.address" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="原计划完成时间">
+              <el-input v-model="ruleForm.original_plan_time" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="方案最新进度详情" prop="tracking_info">
+              <el-input
+                v-model="ruleForm.tracking_info"
+                type="textarea"
+                minlength="20"
+                :show-word-limit="true"
+                placeholder="填写详细进展"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="当前环节" prop="current_process" required>
+              <el-select v-model="ruleForm.current_process">
+                <el-option label="方案制定" value="a"></el-option>
+                <el-option label="施工中" value="b"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="当前环节预计完成" prop="current_expected_time">
+              <el-date-picker
+                v-model="ruleForm.current_expected_time"
+                type="date"
+                placeholder="选择日期"
+                style="width: 180px"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item label="当前环节负责人" required>
+              <el-col :span="11">
+                <el-form-item prop="duty_user">
+                  <el-input v-model="ruleForm.duty_user" placeholder="填写姓名"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col class="line" :span="2">+</el-col>
+              <el-col :span="11">
+                <el-form-item prop="short_tel">
+                  <el-input v-model="ruleForm.short_tel" placeholder="填写短号"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-form-item>
+            <el-form-item label="方案最新预计完成" prop="recent_plan_time">
+              <el-date-picker
+                v-model="ruleForm.recent_plan_time"
+                type="date"
+                placeholder="选择日期"
+                style="width: 180px"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="createComplanTracking('ruleForm')">创建</el-button>
+              <el-button @click="close">关闭</el-button>
+            </el-form-item>
+          </el-form>
+        </el-card>
+      </el-dialog>
     </el-container>
   </div>
 </template>
@@ -348,7 +440,8 @@
 import {
   getComplainPlan,
   updateComplainPlan,
-  getComplainPlanTracking
+  getComplainPlanTracking,
+  postComplainPlanTracking
 } from "@/api/complain.js";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 
@@ -418,13 +511,10 @@ export default {
       citys: ["柯城", "衢江", "江山", "龙游", "常山", "开化"],
       net_type: ["4G", "2G+4G", "2G"],
       yes_or_no: ["是", "否"],
-      temp: {
-        cp_no: "",
-        city: ""
-      }, // 更新数据临时存储
+      temp: {}, // 更新数据临时存储
       textMap: {
-        update: "投诉详单更新",
-        create: "创建投诉详单"
+        update: "编辑进度跟踪",
+        create: "新增进度跟踪"
       },
       dialogFormVisible: false, // 控制对话框是否显示
       dialogStatus: "", // 设置对话框是update还是create
@@ -432,11 +522,12 @@ export default {
       trackingQuery: {
         // 方案流程跟踪查询参数
         page: 1,
-        limit: 3, // 每页显示数量
+        limit: 2, // 每页显示数量
         plan_id: ""
       },
       rowDate: "",
       trackingTotal: 0,
+      reverse: false, // 时间线排序
       trackingData: [
         {
           content: "详情",
@@ -444,7 +535,49 @@ export default {
           color: "#0bbd87",
           user: "张三"
         }
-      ]
+      ],
+      // 进度跟踪弹框数据
+      ruleForm: {
+        plan_id: "",
+        plan_name: "",
+        address: "",
+        original_plan_time: "",
+        tracking_info: "",
+        current_process: "",
+        current_expected_time: "",
+        duty_user: "",
+        short_tel: "",
+        recent_plan_time: ""
+      },
+      rules: {
+        tracking_info: [
+          { required: true, message: "请输入最新进展", trigger: "blur" },
+          { min: 10, max: 100, message: "长度在 10 以上字符", trigger: "blur" }
+        ],
+        current_process: [
+          { required: true, message: "请选择当前环节", trigger: "change" }
+        ],
+        current_expected_time: [
+          {
+            type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "change"
+          }
+        ],
+        recent_plan_time: [
+          {
+            type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "change"
+          }
+        ],
+        duty_user: [
+          { required: true, message: "请填写责任人", trigger: "blur" }
+        ],
+        short_tel: [{ required: true, message: "请填写短号", trigger: "blur" }]
+      }
     };
   },
   mounted() {
@@ -561,10 +694,13 @@ export default {
         var len = data.length;
         for (var i = 0; i < len; i++) {
           this.trackingData.push({
-            content: data[i].tracking_info,
-            timestamp: data[i].update_time,
-            user: data[i].update_user,
-            date: data[i].expected_time
+            tracking_info: data[i].tracking_info,
+            update_time: data[i].update_time,
+            update_user: data[i].update_user,
+            duty_user: data[i].duty_user,
+            short_tel: data[i].short_tel,
+            current_expected_time: data[i].current_expected_time,
+            recent_plan_time: data[i].recent_plan_time
           });
         }
         this.trackingTotal = response.total;
@@ -576,13 +712,83 @@ export default {
       // alert(`当前页: ${val}`);
       this.$forceUpdate();
       this.trackingQuery.page = val;
-      this.getComplainPlanTracking(this.rowData);
+      this.getPlanTracking(this.rowData);
     },
     // 双击某一行，同步呈现进度步骤条
     showProcess(e) {
       // alert(row.plan_name);
       alert(e.current_process);
+    },
+    // ===================
+    // 创建一条方案进度跟踪
+    // ===================
+    handleCreate(row) {
+      // alert(row.plan_id);
+      this.dialogStatus = "create";
+      this.dialogFormVisible = true;
+      // 从表格行读取
+      this.ruleForm.plan_id = row.plan_id;
+      this.ruleForm.plan_name = row.plan_name;
+      this.ruleForm.address = row.address;
+      this.ruleForm.original_plan_time = row.plan_done_date;
+    },
+    createComplanTracking(formName) {
+      // console.log(this.ruleForm);
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          postComplainPlanTracking(this.ruleForm).then(response => {
+            console.log(response);
+          });
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
     }
+    // // 编辑一条方案进度跟踪
+    // handleUpdate(row) {
+    //   // alert(row.plan_id);
+    //   this.temp = Object.assign({}, row); // copy obj
+    //   this.temp.timestamp = new Date(this.temp.timestamp);
+    //   this.dialogStatus = "update";
+    //   this.dialogFormVisible = true;
+    //   this.$nextTick(() => {
+    //     this.$refs["dataForm"].clearValidate();
+    //   });
+    // },
+    // // 取消按钮
+    // cancelUpdate() {
+    //   this.$confirm("是否确认退出?", "提示", {
+    //     confirmButtonText: "确定",
+    //     cancelButtonText: "取消",
+    //     type: "warning",
+    //     center: true
+    //   })
+    //     .then(() => {
+    //       this.dialogFormVisible = false;
+    //     })
+    //     .catch(() => {});
+    // }
+    // 更新数据
+    // updateData() {
+    //   this.$refs["dataForm"].validate(valid => {
+    //     if (valid) {
+    //       const tempData = Object.assign({}, this.temp);
+    //       // console.log(tempData)
+    //       updateComplain(tempData.cp_id, tempData).then(() => {
+    //         // const index = this.list.findIndex(v => v.id === this.temp.id)
+    //         // this.list.splice(index, 1, this.temp)
+    //         this.dialogFormVisible = false;
+    //         this.$notify({
+    //           title: "提醒",
+    //           message: "更新成功",
+    //           type: "success",
+    //           duration: 2000
+    //         });
+    //       });
+    //     }
+    //   });
+    // }
   }
 };
 </script>
@@ -638,8 +844,23 @@ export default {
   /* font-weight: bold; */
   color: #409eff;
 }
+.pop-p {
+  margin: 5px 0px 0px 0px;
+  font-size: 12px;
+  color: #909399;
+}
 .el-timeline {
   padding: 0px 10px;
+}
+.el-dialog {
+  min-width: 500px;
+}
+
+.my /deep/ .el-card__body {
+  padding: 10px;
+}
+.my /deep/ .el-form-item__label {
+  font-size: 12px;
 }
 </style>
 
