@@ -170,7 +170,15 @@
         </template>
       </el-table-column>
       <el-table-column class-name="status-col" label="地图查看" width="80" align="center">
-        <i class="el-icon-view" />
+        <template slot-scope="scope">
+          <el-button
+            type="warning"
+            icon="el-icon-view"
+            size="mini"
+            circle
+            @click="gotoMap(scope.row)"
+          ></el-button>
+        </template>
       </el-table-column>
     </el-table>
 
@@ -582,6 +590,12 @@ export default {
           });
         }
       });
+    },
+    // 在地图查看
+    gotoMap(row) {
+      // alert(row.cp_id);
+      // eslint-disable-next-line object-curly-spacing
+      this.$router.push({ name: "Map", query: { lng: row.lng, lat: row.lat } });
     },
     // excel上传
     uploadExcel(item) {

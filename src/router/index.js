@@ -85,7 +85,7 @@ export const constantRoutes = [
     alwaysShow: true,
     redirect: '/complain/complain-List',
     name: 'Complain',
-    meta: { title: '无线投诉', icon: 'form' },
+    meta: { title: '无线投诉', icon: 'wireless' },
     children: [
       {
         path: 'complain-list',
@@ -120,7 +120,7 @@ export const constantRoutes = [
         path: 'falut-list',
         name: 'FalutList',
         component: () => import('@/views/fault/index'),
-        meta: { title: '退服清单', icon: 'table' }
+        meta: { title: '退服清单', icon: 'site' }
       },
       {
         path: 'falut-analysis',
@@ -138,7 +138,7 @@ export const constantRoutes = [
     name: 'Nested',
     meta: {
       title: '有线故障',
-      icon: 'nested'
+      icon: 'wired'
     },
     children: [
       {

@@ -360,7 +360,7 @@
         center
         width="30%"
         top="5vh"
-        :before-close="cancelUpdate"
+        :before-close="handleClose"
         class="my"
       >
         <el-card>
@@ -399,6 +399,7 @@
             <el-form-item label="当前环节预计完成" prop="current_expected_time">
               <el-date-picker
                 v-model="ruleForm.current_expected_time"
+                value-format="yyyy-MM-dd"
                 type="date"
                 placeholder="选择日期"
                 style="width: 180px"
@@ -420,6 +421,7 @@
             <el-form-item label="方案最新预计完成" prop="recent_plan_time">
               <el-date-picker
                 v-model="ruleForm.recent_plan_time"
+                value-format="yyyy-MM-dd"
                 type="date"
                 placeholder="选择日期"
                 style="width: 180px"
@@ -427,7 +429,7 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="createComplanTracking('ruleForm')">创建</el-button>
-              <el-button @click="close">关闭</el-button>
+              <el-button @click="handleClose">关闭</el-button>
             </el-form-item>
           </el-form>
         </el-card>
@@ -506,14 +508,15 @@ export default {
         is_solved: "否",
         is_overtime: "",
         start_date: "",
-        end_date: ""
+        end_date: "",
+        update_user: ""
       },
       citys: ["柯城", "衢江", "江山", "龙游", "常山", "开化"],
       net_type: ["4G", "2G+4G", "2G"],
       yes_or_no: ["是", "否"],
       temp: {}, // 更新数据临时存储
       textMap: {
-        update: "编辑进度跟踪",
+        update: "修改进度跟踪",
         create: "新增进度跟踪"
       },
       dialogFormVisible: false, // 控制对话框是否显示
@@ -559,7 +562,6 @@ export default {
         ],
         current_expected_time: [
           {
-            type: "date",
             required: true,
             message: "请选择日期",
             trigger: "change"
@@ -567,16 +569,19 @@ export default {
         ],
         recent_plan_time: [
           {
-            type: "date",
             required: true,
             message: "请选择日期",
             trigger: "change"
           }
         ],
         duty_user: [
-          { required: true, message: "请填写责任人", trigger: "blur" }
+          { required: true, message: "请填写责任人", trigger: "blur" },
+          { min: 2, max: 5, message: "长度异常", trigger: "blur" }
         ],
-        short_tel: [{ required: true, message: "请填写短号", trigger: "blur" }]
+        short_tel: [
+          { required: true, message: "请填写短号", trigger: "blur" },
+          { min: 6, max: 6, message: "6位短号", trigger: "blur" }
+        ]
       }
     };
   },
@@ -704,7 +709,9 @@ export default {
           });
         }
         this.trackingTotal = response.total;
-        this.trackingData[0].color = "#0bbd87"; // 最新的进度绿色图标
+        if (this.trackingQuery.page === 1) {
+          this.trackingData[0].color = "#0bbd87"; // 最新进度绿色图标呈现,仅在page=1的情况下生效，防止其他页面第一条显示
+        }
         // this.$set(this.trackingData[i], "color", "#0bbd87");
       });
     },
@@ -744,6 +751,17 @@ export default {
           return false;
         }
       });
+    },
+    // 关闭对话框
+    handleClose() {
+      this.$confirm("是否确认退出?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+        center: true
+      }).then(() => {
+        this.dialogFormVisible = false;
+      });
     }
     // // 编辑一条方案进度跟踪
     // handleUpdate(row) {
@@ -756,19 +774,7 @@ export default {
     //     this.$refs["dataForm"].clearValidate();
     //   });
     // },
-    // // 取消按钮
-    // cancelUpdate() {
-    //   this.$confirm("是否确认退出?", "提示", {
-    //     confirmButtonText: "确定",
-    //     cancelButtonText: "取消",
-    //     type: "warning",
-    //     center: true
-    //   })
-    //     .then(() => {
-    //       this.dialogFormVisible = false;
-    //     })
-    //     .catch(() => {});
-    // }
+
     // 更新数据
     // updateData() {
     //   this.$refs["dataForm"].validate(valid => {
