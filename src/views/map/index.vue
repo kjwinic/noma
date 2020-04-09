@@ -213,8 +213,8 @@
         <bm-marker :position="{lng: coord.lng, lat: coord.lat}" :dragging="true" :icon="coord.icon">
           <bm-label
             :content="coord.label"
-            :label-style="{color: 'red', fontSize : '12px'}"
-            :offset="{width: -60, height: -40}"
+            :label-style="{color: 'gray', fontSize : '12px', padding: '5px', borderRadius: '5px', border: '2px solid #f4516c'}"
+            :offset="{width: -90, height: -50}"
           />
         </bm-marker>
         <bm-control anchor="BMAP_ANCHOR_TOP_RIGHT" :offset="{width:10,height:350}">

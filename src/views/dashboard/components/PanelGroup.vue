@@ -1,5 +1,9 @@
 <template>
   <div class="app-container">
+    <el-divider>
+      <i class="el-icon-view"></i>
+      <span>故障投诉</span>
+    </el-divider>
     <el-row :gutter="40" class="panel-group">
       <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
         <div class="card-panel" @click="gotoComplain">
@@ -98,7 +102,10 @@
         </div>
       </el-col>
     </el-row>
-    <el-divider></el-divider>
+    <el-divider class="my">
+      <i class="el-icon-search"></i>
+      <span>运维管理</span>
+    </el-divider>
     <el-row :gutter="40" class="panel-group">
       <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
         <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
@@ -147,6 +154,28 @@
       <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
         <div class="card-panel" @click="handleSetLineChartData('shoppings')">
           <div class="card-panel-icon-wrapper icon-seven">
+            <svg-icon icon-class="todo" class-name="card-panel-icon" />
+          </div>
+          <div class="card-panel-description">
+            <div class="card-panel-text">待办事项</div>
+            <div class="count">
+              <div class="day">
+                重点工作
+                <count-to :start-val="0" :end-val="20" :duration="3000" class="card-panel-num" />
+                <span class="day">起</span>
+              </div>
+              <div class="month">
+                督办提醒
+                <count-to :start-val="0" :end-val="6" :duration="3600" class="card-panel-num" />
+                <span class="day">起</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </el-col>
+      <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+        <div class="card-panel" @click="handleSetLineChartData('shoppings')">
+          <div class="card-panel-icon-wrapper icon-eight">
             <svg-icon icon-class="safe" class-name="card-panel-icon" />
           </div>
           <div class="card-panel-description">
@@ -155,12 +184,12 @@
               <div class="day">
                 本月割接
                 <count-to :start-val="0" :end-val="13" :duration="3000" class="card-panel-num" />
-                <span class="day">起</span>
+                <span class="day">项</span>
               </div>
               <div class="month">
                 违规
                 <count-to :start-val="0" :end-val="1" :duration="3600" class="card-panel-num" />
-                <span class="day">起</span>
+                <span class="day">项</span>
               </div>
             </div>
           </div>
@@ -254,6 +283,9 @@ export default {
       .icon-six {
         background: #d87a80;
       }
+      .icon-seven {
+        background: red;
+      }
     }
 
     .icon-one {
@@ -277,7 +309,9 @@ export default {
     .icon-six {
       color: #d87a80;
     }
-
+    .icon-seven {
+      color: red;
+    }
     .card-panel-icon-wrapper {
       float: left;
       margin: 14px 0 0 14px;

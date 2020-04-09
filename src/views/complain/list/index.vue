@@ -1,413 +1,483 @@
 <template>
   <div class="app-container">
-    <div class="filter-container">
-      <el-date-picker
-        v-model="select_date"
-        format="yyyy 年 MM 月 dd 日"
-        value-format="yyyy-MM-dd"
-        unlink-panels="true"
-        type="datetimerange"
-        :picker-options="pickerOptions"
-        range-separator="至"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        align="right"
-        @change="handleFilter"
-      />
-      <el-select
-        v-model="listQuery.city"
-        placeholder="县市"
-        clearable
-        style="width: 90px"
-        class="filter-item"
-        @change="handleFilter"
-      >
-        <el-option v-for="item in citys" :key="item" :label="item" :value="item" />
-      </el-select>
-      <el-select
-        v-model="listQuery.is_solved"
-        placeholder="是否解决"
-        clearable
-        style="width: 100px"
-        class="filter-item"
-        @change="handleFilter"
-      >
-        <el-option v-for="item in yes_or_no" :key="item" :label="item" :value="item" />
-      </el-select>
-      <el-select
-        v-model="listQuery.is_overtime"
-        placeholder="是否超期"
-        clearable
-        style="width: 100px"
-        class="filter-item"
-        @change="handleFilter"
-      >
-        <el-option v-for="item in yes_or_no" :key="item" :label="item" :value="item" />
-      </el-select>
-      <el-input
-        v-model="keyword"
-        prefix-icon="el-icon-search"
-        placeholder="搜索用户号码/投诉地点"
-        style="width: 230px;"
-        class="filter-item"
-        clearable="true"
-        @keyup.enter.native="handleFilter"
-        @change="handleFilter"
-      />
-      <el-button
-        v-waves
-        class="filter-item"
-        type="primary"
-        icon="el-icon-search"
-        @click="handleFilter"
-      >搜索</el-button>
-      <el-button
-        class="filter-item"
-        style="margin-left: 10px;"
-        type="primary"
-        icon="el-icon-refresh-right"
-        @click="handleClear"
-      >清空筛选</el-button>
-      <el-button
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="primary"
-        icon="el-icon-download"
-        @click="handleDownload"
-      >批量导出</el-button>
-      <el-upload
-        ref="upload"
-        class="upload"
-        accept=".xlsx"
-        :multiple="false"
-        :show-file-list="false"
-        :before-upload="beforeUpload"
-        :http-request="uploadExcel"
-        :auto-upload="true"
-      >
-        <el-button
-          slot="trigger"
-          :loading="downloadLoading"
-          class="filter-item"
-          type="primary"
-          icon="el-icon-upload"
-        >批量导入</el-button>
-        <div slot="tip" class="el-upload__tip">
-          <a :href="demo_download" download="无线投诉清单导入模板.xlsx">导入模板下载</a>
+    <el-container>
+      <el-main>
+        <div class="filter">
+          <el-date-picker
+            v-model="select_date"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="yyyy-MM-dd"
+            unlink-panels="true"
+            type="datetimerange"
+            :picker-options="pickerOptions"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            align="right"
+            size="mini"
+            @change="handleFilter"
+          />
+          <el-select
+            v-model="listQuery.city"
+            placeholder="县市"
+            :clearable="true"
+            size="mini"
+            style="width: 90px"
+            class="filter-item"
+            @change="handleFilter"
+          >
+            <el-option v-for="item in citys" :key="item" :label="item" :value="item" />
+          </el-select>
+          <el-select
+            v-model="listQuery.is_solved"
+            placeholder="是否解决"
+            :clearable="true"
+            size="mini"
+            style="width: 100px"
+            class="filter-item"
+            @change="handleFilter"
+          >
+            <el-option v-for="item in yes_or_no" :key="item" :label="item" :value="item" />
+          </el-select>
+          <el-select
+            v-model="listQuery.is_overtime"
+            placeholder="是否超期"
+            :clearable="true"
+            size="mini"
+            style="width: 100px"
+            class="filter-item"
+            @change="handleFilter"
+          >
+            <el-option v-for="item in yes_or_no" :key="item" :label="item" :value="item" />
+          </el-select>
+          <el-input
+            v-model="keyword"
+            prefix-icon="el-icon-search"
+            placeholder="搜索用户号码/投诉地点"
+            style="width: 230px;"
+            class="filter-item"
+            :clearable="true"
+            size="mini"
+            @keyup.enter.native="handleFilter"
+            @change="handleFilter"
+          />
+          <el-button
+            class="filter-item"
+            type="primary"
+            size="mini"
+            icon="el-icon-search"
+            @click="handleFilter"
+          >搜索</el-button>
+          <el-button
+            class="filter-item"
+            style="margin-left: 10px;"
+            type="primary"
+            size="mini"
+            icon="el-icon-refresh-right"
+            @click="handleClear"
+          >清空筛选</el-button>
+          <el-button
+            :loading="downloadLoading"
+            class="filter-item"
+            size="mini"
+            type="primary"
+            icon="el-icon-download"
+            @click="handleDownload"
+          >批量导出</el-button>
+          <el-upload
+            ref="upload"
+            class="upload"
+            size="mini"
+            accept=".xlsx"
+            :multiple="false"
+            :show-file-list="false"
+            :before-upload="beforeUpload"
+            :http-request="uploadExcel"
+            :auto-upload="true"
+          >
+            <el-button
+              slot="trigger"
+              :loading="downloadLoading"
+              class="filter-item"
+              type="primary"
+              size="mini"
+              icon="el-icon-upload"
+            >批量导入</el-button>
+            <div slot="tip" class="el-upload__tip">
+              <a :href="demo_download" download="无线投诉清单导入模板.xlsx">导入模板下载</a>
+            </div>
+          </el-upload>
         </div>
-      </el-upload>
-    </div>
-
-    <el-table
-      v-loading="listLoading"
-      :data="list"
-      stripe
-      height="620"
-      element-loading-text="Loading"
-      border
-      fit
-      highlight-current-row
-    >
-      <el-table-column align="center" label="编号" width="80">
-        <template slot-scope="scope">{{ scope.row.cp_id }}</template>
-      </el-table-column>
-      <!--      <el-table-column label="流水号" width="80" align="center" show-overflow-tooltip="true">
+        <!-- 主体表格 -->
+        <div class="table">
+          <el-table
+            v-loading="listLoading"
+            :data="list"
+            stripe
+            height="620"
+            element-loading-text="Loading"
+            border
+            fit
+            highlight-current-row
+          >
+            <el-table-column align="center" label="编号" width="80">
+              <template slot-scope="scope">{{ scope.row.cp_id }}</template>
+            </el-table-column>
+            <!--      <el-table-column label="流水号" width="80" align="center" show-overflow-tooltip="true">
         <template slot-scope="scope">
           {{ scope.row.cp_no }}
         </template>
-      </el-table-column>-->
-      <el-table-column label="投诉日期" width="130" align="center" show-overflow-tooltip="true">
-        <template slot-scope="scope">
-          <i class="el-icon-time" />
-          <span>{{ scope.row.cp_time }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="县市" width="50" align="center">
-        <template slot-scope="scope">{{ scope.row.city }}</template>
-      </el-table-column>
-      <el-table-column label="乡镇/街道" width="100" align="center">
-        <template slot-scope="scope">{{ scope.row.town }}</template>
-      </el-table-column>
-      <el-table-column label="投诉地点" width="100" align="center" show-overflow-tooltip="true">
-        <template slot-scope="scope">{{ scope.row.address }}</template>
-      </el-table-column>
-      <el-table-column label="用户号码" width="130" align="center" show-overflow-tooltip="true">
-        <template slot-scope="scope">{{ scope.row.user_tel }}</template>
-      </el-table-column>
-      <el-table-column label="投诉内容" width="200" align="center" show-overflow-tooltip="true">
-        <template slot-scope="scope">{{ scope.row.cp_info }}</template>
-      </el-table-column>
-      <el-table-column
-        label="处理过程"
-        width="200"
-        align="center"
-        height="50"
-        show-overflow-tooltip="true"
-      >
-        <template slot-scope="scope">{{ scope.row.deal_info }}</template>
-      </el-table-column>
-      <el-table-column class-name="status-col" label="原因分类" width="110" align="center">
-        <template slot-scope="scope">{{ scope.row.cp_type }}</template>
-      </el-table-column>
-      <el-table-column class-name="status-col" label="当前进度" width="110" align="center">
-        <template slot-scope="scope">{{ scope.row.plan_progres }}</template>
-      </el-table-column>
-      <el-table-column class-name="status-col" label="是否解决" width="80" align="center">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.is_solved | statusFilter">{{ scope.row.is_solved }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="80" align="center">
-        <template slot-scope="scope">
-          <!-- <el-button
+            </el-table-column>-->
+            <el-table-column label="投诉日期" width="130" align="center" :show-overflow-tooltip="true">
+              <template slot-scope="scope">
+                <i class="el-icon-time" />
+                <span>{{ scope.row.cp_time }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="县市" width="50" align="center">
+              <template slot-scope="scope">{{ scope.row.city }}</template>
+            </el-table-column>
+            <el-table-column label="乡镇/街道" width="100" align="center">
+              <template slot-scope="scope">{{ scope.row.town }}</template>
+            </el-table-column>
+            <el-table-column label="投诉地点" width="100" align="center" :show-overflow-tooltip="true">
+              <template slot-scope="scope">{{ scope.row.address }}</template>
+            </el-table-column>
+            <el-table-column label="用户号码" width="130" align="center" :show-overflow-tooltip="true">
+              <template slot-scope="scope">{{ scope.row.user_tel }}</template>
+            </el-table-column>
+            <el-table-column label="投诉内容" width="200" align="center" :show-overflow-tooltip="true">
+              <template slot-scope="scope">{{ scope.row.cp_info }}</template>
+            </el-table-column>
+            <el-table-column
+              label="处理过程"
+              width="180"
+              align="center"
+              height="50"
+              :show-overflow-tooltip="true"
+            >
+              <template slot-scope="scope">{{ scope.row.deal_info }}</template>
+            </el-table-column>
+            <el-table-column class-name="status-col" label="原因分类" width="110" align="center">
+              <template slot-scope="scope">{{ scope.row.cp_type }}</template>
+            </el-table-column>
+            <el-table-column class-name="status-col" label="当前进度" width="110" align="center">
+              <template slot-scope="scope">{{ scope.row.plan_progres }}</template>
+            </el-table-column>
+            <el-table-column class-name="status-col" label="是否解决" width="80" align="center">
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.is_solved | statusFilter">{{ scope.row.is_solved }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="80" align="center">
+              <template slot-scope="scope">
+                <!-- <el-button
             size="mini"
             type="danger"
             @click="handleDelete(scope.row.cp_id, scope.row)"
           >
-          删除 </el-button>-->
-          <el-button size="mini" type="primary" @click="handleUpdate(scope.row)">编辑</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column class-name="status-col" label="地图查看" width="80" align="center">
-        <template slot-scope="scope">
-          <el-button
-            type="warning"
-            icon="el-icon-view"
-            size="mini"
-            circle
-            @click="gotoMap(scope.row)"
-          ></el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
-      @pagination="getComplainList"
-    />
-
-    <el-dialog
-      :title="textMap[dialogStatus]"
-      :visible.sync="dialogFormVisible"
-      center
-      width="60%"
-      top="5vh"
-      :before-close="cancelUpdate"
-    >
-      <el-form
-        ref="dataForm"
-        :rules="rules"
-        :model="temp"
-        label-position="left"
-        label-width="70px"
-        style="width: 800px; margin-left:50px;"
-        size="mini"
-      >
-        <el-row :gutter="20">
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="流水号">
-              <el-input v-model="temp.cp_no" disabled="true" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="投诉时间">
-              <el-input v-model="temp.cp_time" disabled="true" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="投诉日期">
-              <el-input v-model="temp.cp_date" disabled="true" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="县市" prop="type">
-              <el-select v-model="temp.city" class="filter-item" placeholder="Please select">
-                <el-option v-for="item in citys" :key="item" :label="item" :value="item" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="用户号码">
-              <el-input v-model="temp.user_tel" disabled="true" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="用户星级">
-              <el-input v-model="temp.user_star" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="终端型号">
-              <el-input v-model="temp.phone_type" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="投诉区域" prop="type">
-              <el-select v-model="temp.area" class="filter-item" placeholder="Please select">
-                <el-option v-for="item in area" :key="item" :label="item" :value="item" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="区域类型">
-              <el-select v-model="temp.area_type" class="filter-item" placeholder="Please select">
-                <el-option v-for="item in area_type" :key="item" :label="item" :value="item" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :xs="6" :sm="25" :md="50" :lg="50" :xl="80">
-            <el-form-item label="投诉内容">
-              <el-input v-model="temp.cp_info" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :xs="6" :sm="25" :md="60" :lg="90" :xl="120">
-            <el-form-item label="处理过程">
-              <el-input
-                v-model="temp.deal_info"
-                type="textarea"
-                :autosize="{ minRows: 2, maxRows: 4}"
-              />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="经度" prop="type">
-              <el-input v-model="temp.lng" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="纬度" prop="type">
-              <el-input v-model="temp.lat" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="投诉栅格" prop="type">
-              <el-input v-model="temp.raster" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="原因分类" prop="type">
-              <el-select v-model="temp.cp_type" class="filter-item" placeholder="Please select">
-                <el-option v-for="item in cp_type" :key="item" :label="item" :value="item" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="影响网络">
-              <el-select v-model="temp.net_type" class="filter-item" placeholder="Please select">
-                <el-option v-for="item in net_type" :key="item" :label="item" :value="item" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="乡镇街道" prop="type">
-              <el-input v-model="temp.town" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="投诉地点" prop="type">
-              <el-input v-model="temp.address" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="影响人口" prop="type">
-              <el-input v-model="temp.poor_coverage" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="方案类型">
-              <el-select v-model="temp.solve_type" class="filter-item" placeholder="Please select">
-                <el-option v-for="item in solve_type" :key="item" :label="item" :value="item" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="解决方案" prop="type">
-              <el-input v-model="temp.solve_plan" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="方案进度">
-              <el-input v-model="temp.plan_progres" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="是否解决" prop="type">
-              <el-badge :value="temp.is_solved=='否'?'待解决':''" class="item">
-                <el-select v-model="temp.is_solved" class="filter-item" placeholder="Please select">
-                  <el-option v-for="item in yes_or_no" :key="item" :label="item" :value="item" />
-                </el-select>
-              </el-badge>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="预计时间">
-              <!-- <el-date-picker
+                删除 </el-button>-->
+                <el-button size="mini" type="primary" @click="handleUpdate(scope.row)">编辑</el-button>
+              </template>
+            </el-table-column>
+            <el-table-column class-name="status-col" label="地图查看" width="80" align="center">
+              <template slot-scope="scope">
+                <el-button
+                  type="warning"
+                  icon="el-icon-view"
+                  size="mini"
+                  circle
+                  @click="gotoMap(scope.row)"
+                ></el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <pagination
+          v-show="total>0"
+          :total="total"
+          :page.sync="listQuery.page"
+          :limit.sync="listQuery.limit"
+          @pagination="getComplainList"
+        />
+        <!-- 编辑信息弹窗 -->
+        <el-dialog
+          :title="textMap[dialogStatus]"
+          :visible.sync="dialogFormVisible"
+          center
+          width="50%"
+          top="5vh"
+          :fullscreen="true"
+          :before-close="cancelUpdate"
+        >
+          <div class="edit-pop">
+            <div class="left-form">
+              <el-form
+                ref="dataForm"
+                :rules="rules"
+                :model="temp"
+                label-position="left"
+                label-width="70px"
+                style="width: 700px; margin-left:50px;"
+                size="mini"
+              >
+                <el-row :gutter="20">
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="流水号">
+                      <el-input v-model="temp.cp_no" disabled="true" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="投诉时间">
+                      <el-input v-model="temp.cp_time" disabled="true" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="投诉日期">
+                      <el-input v-model="temp.cp_date" disabled="true" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="县市" prop="type">
+                      <el-select v-model="temp.city" class="filter-item" placeholder="选择县市">
+                        <el-option v-for="item in citys" :key="item" :label="item" :value="item" />
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="用户号码">
+                      <el-input v-model="temp.user_tel" disabled="true" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="用户星级">
+                      <el-input v-model="temp.user_star" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="终端型号">
+                      <el-input v-model="temp.phone_type" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="投诉区域" prop="type">
+                      <el-select v-model="temp.area" class="filter-item" placeholder="选择区域">
+                        <el-option v-for="item in area" :key="item" :label="item" :value="item" />
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="区域类型">
+                      <el-select
+                        v-model="temp.area_type"
+                        class="filter-item"
+                        placeholder="Please select"
+                      >
+                        <el-option
+                          v-for="item in area_type"
+                          :key="item"
+                          :label="item"
+                          :value="item"
+                        />
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :xs="6" :sm="25" :md="50" :lg="50" :xl="80">
+                    <el-form-item label="投诉内容">
+                      <el-input v-model="temp.cp_info" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :xs="6" :sm="25" :md="60" :lg="90" :xl="120">
+                    <el-form-item label="处理过程">
+                      <el-input
+                        v-model="temp.deal_info"
+                        type="textarea"
+                        :autosize="{ minRows: 2, maxRows: 4}"
+                      />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="6">
+                    <el-form-item label="经度" prop="type">
+                      <el-input v-model="temp.lng" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="6">
+                    <el-form-item label="纬度" prop="type">
+                      <el-input v-model="temp.lat" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="6" :xl="5">
+                    <el-form-item label="投诉栅格" prop="type">
+                      <el-input v-model="temp.raster" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="2" :xl="5">
+                    <el-button
+                      type="danger"
+                      icon="el-icon-location"
+                      size="mini"
+                      round
+                      @click="viewOnMap"
+                    >地图</el-button>
+                  </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="乡镇街道" prop="type">
+                      <el-input v-model="temp.town" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="投诉地点" prop="type">
+                      <el-input v-model="temp.address" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="影响人口" prop="type">
+                      <el-input v-model="temp.poor_coverage" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="原因分类" prop="type">
+                      <el-select v-model="temp.cp_type" class="filter-item" placeholder="选择原因">
+                        <el-option v-for="item in cp_type" :key="item" :label="item" :value="item" />
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="影响网络">
+                      <el-select
+                        v-model="temp.net_type"
+                        class="filter-item"
+                        placeholder="Please select"
+                      >
+                        <el-option
+                          v-for="item in net_type"
+                          :key="item"
+                          :label="item"
+                          :value="item"
+                        />
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="方案类型">
+                      <el-select v-model="temp.solve_type" class="filter-item" placeholder="选择方案类型">
+                        <el-option
+                          v-for="item in solve_type"
+                          :key="item"
+                          :label="item"
+                          :value="item"
+                        />
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="解决方案" prop="type">
+                      <el-input v-model="temp.solve_plan" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="方案进度">
+                      <el-input v-model="temp.plan_progres" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="是否解决" prop="type">
+                      <el-badge :value="temp.is_solved=='否'?'待解决':''" class="item">
+                        <el-select
+                          v-model="temp.is_solved"
+                          class="filter-item"
+                          placeholder="Please select"
+                        >
+                          <el-option
+                            v-for="item in yes_or_no"
+                            :key="item"
+                            :label="item"
+                            :value="item"
+                          />
+                        </el-select>
+                      </el-badge>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="预计时间">
+                      <!-- <el-date-picker
               v-model="temp.plan_time"
               type="date"
               placeholder="选择日期"
               size="mini">
-              </el-date-picker>-->
-              <el-input v-model="temp.plan_time" placeholder="预计解决（格式2020-03-28）" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="实际时间">
-              <el-input v-model="temp.solved_time" placeholder="实际解决（格式2020-03-28）" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :xs="6" :sm="25" :md="60" :lg="90" :xl="120">
-            <el-form-item label="最新进展">
-              <el-input
-                v-model="temp.tracking_info"
-                type="textarea"
-                :autosize="{ minRows: 1, maxRows: 2}"
-                placeholder="解决方案的最新进度"
-              />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="处理人">
-              <el-input v-model="temp.deal_user" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-            <el-form-item label="值班人">
-              <el-input v-model="temp.duty_user" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="cancelUpdate">取消</el-button>
-        <el-button type="primary" @click="updateData">保存</el-button>
-      </div>
-    </el-dialog>
+                      </el-date-picker>-->
+                      <el-input v-model="temp.plan_time" placeholder="预计解决（格式2020-03-28）" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="实际时间">
+                      <el-input v-model="temp.solved_time" placeholder="实际解决（格式2020-03-28）" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :xs="6" :sm="25" :md="60" :lg="90" :xl="120">
+                    <el-form-item label="最新进展">
+                      <el-input
+                        v-model="temp.tracking_info"
+                        type="textarea"
+                        :autosize="{ minRows: 1, maxRows: 2}"
+                        placeholder="解决方案的最新进度"
+                      />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="处理人">
+                      <el-input v-model="temp.deal_user" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item label="值班人">
+                      <el-input v-model="temp.duty_user" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                    <el-form-item>
+                      <el-button @click="cancelUpdate">取消</el-button>
+                      <el-button type="primary" @click="updateData">保存</el-button>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </el-form>
+            </div>
+
+            <!-- 查看地图弹窗 ,需放在信息编辑弹窗中-->
+            <div class="right-map">
+              <template>
+                <YiBaiduMap :zoom="zoom" :center="center" :marker="center" />
+              </template>
+            </div>
+          </div>
+        </el-dialog>
+      </el-main>
+    </el-container>
   </div>
 </template>
 
@@ -415,10 +485,12 @@
 import { getComplain, updateComplain, uploadComplain } from "@/api/complain.js";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 import { parseTime } from "@/utils";
+import { wgs84tobd09, bd09towgs84 } from "@/utils/transformCoordinate.js";
+import YiBaiduMap from "@/components/Yi-BaiduMap";
 
 export default {
   name: "ComplainList",
-  components: { Pagination },
+  components: { Pagination, YiBaiduMap },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -495,8 +567,16 @@ export default {
         create: "创建投诉详单"
       },
       dialogFormVisible: false, // 控制对话框是否显示
+      showPopMap: false, // 查看地图对话框
       dialogStatus: "", // 设置对话框是update还是create
-      demo_download: "./static/complain.xlsx" // 导入模板地址
+      demo_download: "./static/complain.xlsx", // 导入模板地址
+      center: "衢州市",
+      ak: "U43Xy5aiHHDKWZwQOxPn7NS8kGdv8kFO",
+      zoom: 17,
+      lng: 0,
+      lat: 0,
+      town: "",
+      address: ""
     };
   },
   created() {
@@ -557,6 +637,7 @@ export default {
       this.$nextTick(() => {
         this.$refs["dataForm"].clearValidate();
       });
+      this.viewOnMap();
     },
     // 取消按钮
     cancelUpdate() {
@@ -596,6 +677,41 @@ export default {
       // alert(row.cp_id);
       // eslint-disable-next-line object-curly-spacing
       this.$router.push({ name: "Map", query: { lng: row.lng, lat: row.lat } });
+    },
+    // 编辑弹窗中，查看地图
+    async viewOnMap() {
+      // alert(this.zoom);
+      // 经纬度转换
+      var point = wgs84tobd09(this.temp.lng, this.temp.lat);
+      this.center = {
+        lng: point[0],
+        lat: point[1]
+      };
+      this.showPopMap = true;
+      await this.baiduReverseGeocoder(this.center.lng, this.center.lat);
+      // alert(this.town);
+    },
+    // 获取投诉点关联的百度地图地址信息
+    async baiduReverseGeocoder(lng, lat) {
+      var url =
+        "http://api.map.baidu.com/reverse_geocoding/v3/?ak=" +
+        this.ak +
+        "&output=json&coordtype=bd09ll&ret_coordtype=bd09ll&extensions_poi=1&extensions_town=true&&location=" +
+        lat +
+        "," +
+        lng;
+      await this.$jsonp(url).then(res => {
+        // console.log(res.result)
+        var data = res.result;
+        this.lng = data.location.lng;
+        this.lat = data.location.lat;
+        this.town = data.addressComponent.town; // 乡镇、街道
+        // console.log(this.town);
+        var address =
+          data.addressComponent.district + data.addressComponent.town; // 县市+乡镇/街道
+        var poi = data.sematic_description.split(",")[0]; // poi，具体到小区或村庄
+        this.address = address + poi;
+      });
     },
     // excel上传
     uploadExcel(item) {
@@ -729,7 +845,9 @@ export default {
 .el-tooltip__popper {
   max-width: 50%;
 }
-.filter-container {
+.filter {
+  display: flex;
+  flex-flow: row;
   padding-bottom: 10px;
 }
 .el-row {
@@ -749,11 +867,11 @@ export default {
 // .el-dialog__footer{
 //   padding: 5px;
 // }
-.filter-container {
+.filter {
   display: flex;
   padding-left: 5px;
 }
-.filter-container div {
+.filter div {
   display: flex;
   padding-left: 5px;
 }
@@ -765,6 +883,38 @@ export default {
   text-decoration: underline;
 }
 .app-container {
-  padding-top: 40px;
+  padding-top: 30px;
+}
+.pagination-container {
+  padding: 10px;
+  float: right;
+}
+.el-main {
+  padding: 10px;
+}
+.edit-pop {
+  display: flex;
+  flex-flow: row;
+}
+.left-form {
+  display: flex;
+  width: 50%;
+}
+.right-map {
+  padding-left: 20px;
+  width: 100%;
+  height: 600px;
+}
+.BMap_mask {
+  height: 650px;
+}
+.pop-loc {
+  color: red;
+  font-size: 20px;
+}
+
+.bm-view {
+  width: 100%;
+  height: 500px;
 }
 </style>
