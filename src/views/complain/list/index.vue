@@ -209,6 +209,8 @@
           top="5vh"
           :fullscreen="true"
           :before-close="cancelUpdate"
+          class="my"
+          @get-coord="getCoord"
         >
           <div class="edit-pop">
             <div class="left-form">
@@ -306,29 +308,29 @@
                   </el-col>
                 </el-row>
                 <el-row :gutter="20">
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="6">
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="8">
                     <el-form-item label="经度" prop="type">
-                      <el-input v-model="temp.lng" />
+                      <el-input
+                        v-model="temp.lng"
+                        tabindex="lng"
+                        :class="change_flag? 'input-change':''"
+                        @input="inputChange"
+                      />
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="6">
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="8">
                     <el-form-item label="纬度" prop="type">
-                      <el-input v-model="temp.lat" />
+                      <el-input
+                        v-model="temp.lat"
+                        :class="change_flag? 'input-change':''"
+                        @input="inputChange"
+                      />
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="6" :xl="5">
-                    <el-form-item label="投诉栅格" prop="type">
-                      <el-input v-model="temp.raster" />
+                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="8">
+                    <el-form-item label="修改报错">
+                      <el-button type="danger" icon="el-icon-location" size="mini" round>开启地图拾取经纬度</el-button>
                     </el-form-item>
-                  </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="2" :xl="5">
-                    <el-button
-                      type="danger"
-                      icon="el-icon-location"
-                      size="mini"
-                      round
-                      @click="viewOnMap"
-                    >地图</el-button>
                   </el-col>
                 </el-row>
                 <el-row :gutter="20">
@@ -358,11 +360,7 @@
                   </el-col>
                   <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
                     <el-form-item label="影响网络">
-                      <el-select
-                        v-model="temp.net_type"
-                        class="filter-item"
-                        placeholder="Please select"
-                      >
+                      <el-select v-model="temp.net_type" class="filter-item" placeholder="请选择">
                         <el-option
                           v-for="item in net_type"
                           :key="item"
@@ -370,6 +368,11 @@
                           :value="item"
                         />
                       </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="4" :sm="5" :md="6" :lg="6" :xl="8">
+                    <el-form-item label="投诉栅格" prop="type">
+                      <el-input v-model="temp.raster" />
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -562,6 +565,7 @@ export default {
         cp_no: "",
         city: ""
       }, // 更新数据临时存储
+      original: {},
       textMap: {
         update: "投诉详单更新",
         create: "创建投诉详单"
@@ -576,7 +580,8 @@ export default {
       lng: 0,
       lat: 0,
       town: "",
-      address: ""
+      address: "",
+      change_flag: false
     };
   },
   created() {
@@ -584,6 +589,19 @@ export default {
     this.getComplainList();
   },
   methods: {
+    inputChange(e) {
+      // alert(e);
+      if (e === "") {
+        this.change_flag = false;
+      } else {
+        this.change_flag = true;
+      }
+    },
+    getCoord(data) {
+      alert(data);
+      // this.temp.lng = data.lng;
+      // this.temp.lat = data.lat;
+    },
     // 获取用户投诉详单
     getComplainList() {
       this.listLoading = true;
@@ -630,6 +648,7 @@ export default {
     },
     // 编辑
     handleUpdate(row) {
+      this.original = row;
       this.temp = Object.assign({}, row); // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp);
       this.dialogStatus = "update";
@@ -903,7 +922,7 @@ export default {
 .right-map {
   padding-left: 20px;
   width: 100%;
-  height: 600px;
+  border-radius: 5px;
 }
 .BMap_mask {
   height: 650px;
@@ -915,6 +934,25 @@ export default {
 
 .bm-view {
   width: 100%;
-  height: 500px;
+  height: 700px;
 }
+.my /deep/ .el-dialog__header {
+  background-color: #0085d0;
+}
+.my /deep/ .el-dialog__title {
+  color: #fff;
+  font-size: bolder;
+}
+.my /deep/ .el-dialog__close {
+  color: #fff;
+}
+.input-change .el-input__inner {
+  background-color: rgba(230, 162, 60, 0.87);
+  color: #fff;
+}
+
+// .no-null-input .el-input__inner {
+//   background-color: rgb(60, 11, 173);
+//   color: #524f52;
+// }
 </style>

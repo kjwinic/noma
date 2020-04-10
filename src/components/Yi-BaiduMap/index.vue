@@ -90,6 +90,9 @@ export default {
         "<br />地  址：" +
         this.address;
       // this.value = "当前经纬度：" + this.coord.lng + ";" + this.coord.lat; // 经纬度赋值到搜索框，用于粘贴
+      const data = { lng: this.coord.lng, lat: this.coord.lat };
+      // alert(this.coord.lng);
+      this.$emit("get-coord", this.coord.lng);
     },
     // 百度逆地址转换
     async baiduReverseGeocoder(lng, lat) {
@@ -123,6 +126,6 @@ export default {
 <style>
 .bm-view {
   width: 100%;
-  height: 600px;
+  height: 500px;
 }
 </style>
