@@ -284,13 +284,15 @@
               fixed="right"
             >
               <template slot-scope="{row}">
-                <el-button
-                  type="success"
-                  icon="el-icon-thumb"
-                  size="mini"
-                  circle
-                  @click="handleCreate(row)"
-                ></el-button>
+                <el-tooltip content="点击录入进度" placement="top">
+                  <el-button
+                    type="success"
+                    icon="el-icon-thumb"
+                    size="mini"
+                    circle
+                    @click="handleCreate(row)"
+                  ></el-button>
+                </el-tooltip>
                 <el-popover
                   placement="left-start"
                   :title="row.plan_name"

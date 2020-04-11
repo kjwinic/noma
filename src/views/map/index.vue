@@ -324,7 +324,7 @@ export default {
         height: "710px"
       },
       town: "白云街道",
-      address: "",
+      area: "",
       lng: 0,
       lat: 0,
       coord: {
@@ -374,7 +374,7 @@ export default {
         is_overtime: "",
         start_date: "",
         end_date: "",
-        address: ""
+        area: ""
       },
       select_date: "",
       popHeight: "700px",
@@ -401,6 +401,7 @@ export default {
           label: "搜索坐标"
         }
       ],
+      coordinate: "bd09", // 坐标系
       screenWidth: "",
       search_type: "",
       search_results: [],
@@ -411,14 +412,17 @@ export default {
   },
   mounted() {
     // this.screenWidth = document.body.clientWidth;
+    this.getDate(); // 获取当前时间
+    this.getMapCenter();
   },
   unmount() {
     this.distanceTool && this.distanceTool.close();
   },
-  onLoad() {
-    this.getDate(); // 获取当前时间
-    this.getMapCenter();
-    // this.getCoord();
+  activated() {
+    // alert(this.$route.params.point.lng);
+    var p = this.$route.params.point;
+    this.coordinate = "wgs84";
+    this.createMarker(p.lng, p.lat, p.label);
   },
   methods: {
     querySearch(queryString, cb) {
@@ -501,10 +505,10 @@ export default {
         is_overtime: "",
         start_date: "",
         end_date: "",
-        address: ""
+        area: ""
       };
-      console.log("清空后");
-      console.log(this.listQuery);
+      // console.log("清空后");
+      // console.log(this.listQuery);
     },
     // 下拉选择搜索类型
     selectSearch(e) {
@@ -542,7 +546,7 @@ export default {
       this.search_results = [];
       this.listQuery.page = 1;
       this.listQuery.limit = 20;
-      this.listQuery.address = keyword;
+      this.listQuery.area = keyword;
       getComplain(this.listQuery)
         .then(response => {
           // console.log(response.data);
@@ -584,6 +588,7 @@ export default {
     },
     searchCoord(keyword) {
       // alert("搜索坐标" + keyword);
+      this.coordinate = "wgs84";
       var arr = keyword.split(/,|，|;|；/);
       var lng = parseFloat(arr[0]); // 转换为float
       var lat = parseFloat(arr[1]);
@@ -592,14 +597,21 @@ export default {
       if (!lng & !lat) {
         this.list = [];
       } // 搜索结果为空
-      this.center = { lng: lng, lat: lat }; // 设置地图中心
-      this.zoom = 19;
       this.createMarker(lng, lat, label); // 创建搜索结果点
     },
     createMarker(lng, lat, label) {
-      this.coord.lng = lng;
-      this.coord.lat = lat;
+      if (this.coordinate === "wgs84") {
+        var point = wgs84tobd09(lng, lat);
+        this.coord.lng = point[0];
+        this.coord.lat = point[1];
+      } else if (this.coordinate === "bd09") {
+        this.coord.lng = lng;
+        this.coord.lat = lat;
+      }
       this.coord.label = label;
+      this.center = { lng: this.coord.lng, lat: this.coord.lat }; // 设置地图中心
+      this.zoom = 19;
+
       // this.coord.icon = "/image/coord-point.png";
     },
     // 获取地图中心点坐标
@@ -646,6 +658,7 @@ export default {
     },
     // 获取投诉数据
     getCompalins() {
+      console.log(this.listQuery);
       // this.complain_flag = !this.complain_flag;
       this.loading = true;
       getComplain(this.listQuery)
@@ -693,7 +706,7 @@ export default {
               lng: e.point.lng,
               lat: e.point.lat
             },
-            title: data.city + data.town + data.address,
+            title: data.city + data.town + data.area,
             show: true,
             content: {
               info1: "投诉时间：" + data.cp_time,

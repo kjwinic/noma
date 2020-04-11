@@ -141,7 +141,7 @@
               <template slot-scope="scope">{{ scope.row.town }}</template>
             </el-table-column>
             <el-table-column label="投诉地点" width="100" align="center" :show-overflow-tooltip="true">
-              <template slot-scope="scope">{{ scope.row.address }}</template>
+              <template slot-scope="scope">{{ scope.row.area }}</template>
             </el-table-column>
             <el-table-column label="用户号码" width="130" align="center" :show-overflow-tooltip="true">
               <template slot-scope="scope">{{ scope.row.user_tel }}</template>
@@ -208,9 +208,8 @@
           width="50%"
           top="5vh"
           :fullscreen="true"
-          :before-close="cancelUpdate"
+          :before-close="closeUpdate"
           class="my"
-          @get-coord="getCoord"
         >
           <div class="edit-pop">
             <div class="left-form">
@@ -266,8 +265,8 @@
                     </el-form-item>
                   </el-col>
                   <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-                    <el-form-item label="投诉区域" prop="type">
-                      <el-select v-model="temp.area" class="filter-item" placeholder="选择区域">
+                    <el-form-item label="城区农村" prop="type">
+                      <el-select v-model="temp.is_village" class="filter-item" placeholder="选择区域">
                         <el-option v-for="item in area" :key="item" :label="item" :value="item" />
                       </el-select>
                     </el-form-item>
@@ -275,7 +274,7 @@
                   <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
                     <el-form-item label="区域类型">
                       <el-select
-                        v-model="temp.area_type"
+                        v-model="temp.place"
                         class="filter-item"
                         placeholder="Please select"
                       >
@@ -329,7 +328,22 @@
                   </el-col>
                   <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="8">
                     <el-form-item label="修改报错">
-                      <el-button type="danger" icon="el-icon-location" size="mini" round>开启地图拾取经纬度</el-button>
+                      <el-button
+                        v-if="!getcoord_flag"
+                        type="success"
+                        icon="el-icon-location"
+                        size="mini"
+                        round
+                        @click="opengetCoord"
+                      >开启地图拾取经纬度</el-button>
+                      <el-button
+                        v-else
+                        type="danger "
+                        icon="el-icon-location"
+                        size="mini"
+                        round
+                        @click="opengetCoord"
+                      >关闭地图拾取经纬度</el-button>
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -340,13 +354,24 @@
                     </el-form-item>
                   </el-col>
                   <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
-                    <el-form-item label="投诉地点" prop="type">
-                      <el-input v-model="temp.address" />
+                    <el-form-item label="投诉区域" prop="type">
+                      <el-input v-model="temp.area" />
                     </el-form-item>
                   </el-col>
                   <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
                     <el-form-item label="影响人口" prop="type">
                       <el-input v-model="temp.poor_coverage" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :xs="6" :sm="25" :md="50" :lg="50" :xl="80">
+                    <el-form-item label="详细地址">
+                      <el-input
+                        v-model="temp.address"
+                        :class="change_flag? 'input-change':''"
+                        @input="inputChange"
+                      />
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -461,9 +486,13 @@
                   </el-col>
                 </el-row>
                 <el-row :gutter="20">
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="12">
                     <el-form-item>
-                      <el-button @click="cancelUpdate">取消</el-button>
+                      <el-button type="info" @click="closeUpdate">关闭</el-button>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item>
                       <el-button type="primary" @click="updateData">保存</el-button>
                     </el-form-item>
                   </el-col>
@@ -474,7 +503,16 @@
             <!-- 查看地图弹窗 ,需放在信息编辑弹窗中-->
             <div class="right-map">
               <template>
-                <YiBaiduMap :zoom="zoom" :center="center" :marker="center" />
+                <YiBaiduMap
+                  v-loading="loading"
+                  element-loading-text="投诉数据加载中"
+                  :zoom="zoom"
+                  :center="center"
+                  :marker="center"
+                  :is-get-coord="getcoord_flag"
+                  :points="complain_points"
+                  @getCoord="getCoord"
+                />
               </template>
             </div>
           </div>
@@ -488,7 +526,7 @@
 import { getComplain, updateComplain, uploadComplain } from "@/api/complain.js";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 import { parseTime } from "@/utils";
-import { wgs84tobd09, bd09towgs84 } from "@/utils/transformCoordinate.js";
+import { wgs84tobd09 } from "@/utils/transformCoordinate.js";
 import YiBaiduMap from "@/components/Yi-BaiduMap";
 
 export default {
@@ -552,11 +590,11 @@ export default {
         is_overtime: "",
         start_date: "",
         end_date: "",
-        address: ""
+        area: ""
       },
       citys: ["柯城", "衢江", "江山", "龙游", "常山", "开化", "外地"],
-      area: ["城区", "农村"],
-      area_type: ["商业区", "居民小区", "住宅区"],
+      is_village: ["城区", "农村"],
+      place: ["商业区", "居民小区", "住宅区"],
       cp_type: ["4G弱覆盖", "2G+4G弱覆盖", "2G弱覆盖", "设备故障", "无法确定"],
       net_type: ["4G", "2G+4G", "2G"],
       solve_type: ["规划", "优化", "不解决", "故障"],
@@ -567,7 +605,7 @@ export default {
       }, // 更新数据临时存储
       original: {},
       textMap: {
-        update: "投诉详单更新",
+        update: "修改投诉详单",
         create: "创建投诉详单"
       },
       dialogFormVisible: false, // 控制对话框是否显示
@@ -581,7 +619,10 @@ export default {
       lat: 0,
       town: "",
       address: "",
-      change_flag: false
+      change_flag: false, // 是否修改标记
+      getcoord_flag: false, // 是否打开坐标拾取标价
+      complain_points: [],
+      loading: false
     };
   },
   created() {
@@ -589,6 +630,32 @@ export default {
     this.getComplainList();
   },
   methods: {
+    // 弹窗页面，获取投诉数据
+    getCompalins() {
+      // 当前县市全量投诉
+      this.listQuery.limit = 0;
+      this.listQuery.city = this.temp.city;
+      this.loading = true;
+      getComplain(this.listQuery)
+        .then(response => {
+          // console.log(response.data);
+          var data = response.data;
+          var len = data.length;
+          for (var i = 0; i < len; i++) {
+            // console.log(data[i].lng);
+            var point = wgs84tobd09(data[i].lng, data[i].lat);
+            // console.log(point[0]);
+            data[i].lng = point[0];
+            data[i].lat = point[1];
+          }
+          this.complain_points = data;
+          this.loading = false;
+        })
+        .catch(response => {
+          this.loading = false;
+        });
+    },
+    // 输入框发生变化
     inputChange(e) {
       // alert(e);
       if (e === "") {
@@ -597,10 +664,30 @@ export default {
         this.change_flag = true;
       }
     },
+    // 打开拾取坐标
+    opengetCoord() {
+      this.getcoord_flag = !this.getcoord_flag;
+      // this.getcoord_flag = true;
+      if (this.getcoord_flag) {
+        this.$message({
+          message: "已开启坐标拾取功能",
+          type: "success",
+          duration: "1000"
+        });
+      } else {
+        this.$message({
+          message: "坐标拾取已关闭",
+          duration: "1000"
+        });
+      }
+    },
     getCoord(data) {
-      alert(data);
-      // this.temp.lng = data.lng;
-      // this.temp.lat = data.lat;
+      // alert(data.address);
+      this.temp.lng = data.lng;
+      this.temp.lat = data.lat;
+      this.temp.town = data.town;
+      this.temp.address = data.address;
+      this.change_flag = true;
     },
     // 获取用户投诉详单
     getComplainList() {
@@ -619,7 +706,7 @@ export default {
         // 搜索为用户号码
         this.listQuery.user_tel = this.keyword; // 用户号码搜索
       } else {
-        this.listQuery.address = this.keyword; // 投诉地点搜索
+        this.listQuery.area = this.keyword; // 投诉地点搜索
       }
       this.listQuery.start_date = this.select_date[0];
       this.listQuery.end_date = this.select_date[1];
@@ -641,7 +728,7 @@ export default {
       this.listQuery.is_solved = "";
       this.listQuery.is_overtime = "";
       this.listQuery.user_tel = "";
-      this.listQuery.address = "";
+      this.listQuery.area = "";
       this.listQuery.start_date = "";
       this.listQuery.end_date = "";
       this.getComplainList();
@@ -657,10 +744,16 @@ export default {
         this.$refs["dataForm"].clearValidate();
       });
       this.viewOnMap();
+      this.getCompalins();
     },
     // 取消按钮
-    cancelUpdate() {
-      this.$confirm("是否确认退出?", "提示", {
+    closeUpdate() {
+      // 无更新直接关闭
+      if (!this.change_flag) {
+        this.dialogFormVisible = false;
+        return;
+      }
+      this.$confirm("修改未保存，是否确认退出?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
@@ -668,6 +761,8 @@ export default {
       })
         .then(() => {
           this.dialogFormVisible = false;
+          this.change_flag = false; // 还原默认未修改
+          this.getcoord_flag = false;
         })
         .catch(() => {});
     },
@@ -688,6 +783,7 @@ export default {
               duration: 2000
             });
           });
+          this.getComplainList();
         }
       });
     },
@@ -695,7 +791,11 @@ export default {
     gotoMap(row) {
       // alert(row.cp_id);
       // eslint-disable-next-line object-curly-spacing
-      this.$router.push({ name: "Map", query: { lng: row.lng, lat: row.lat } });
+      this.$router.push({
+        name: "Map",
+        // eslint-disable-next-line object-curly-spacing
+        params: { point: { label: row.cp_info, lng: row.lng, lat: row.lat } }
+      });
     },
     // 编辑弹窗中，查看地图
     async viewOnMap() {
@@ -789,12 +889,13 @@ export default {
           "终端型号",
           "用户星级",
           "县市",
-          "投诉区域",
-          "区域分类",
+          "城区/农村",
+          "覆盖场景",
           "投诉内容",
           "处理过程",
           "原因分类",
           "乡镇",
+          "投诉区域",
           "投诉地点",
           "方案类别",
           "解决方案",
@@ -815,12 +916,13 @@ export default {
           "phone_type",
           "user_star",
           "city",
-          "area",
-          "area_type",
+          "is_village",
+          "place",
           "cp_info",
           "deal_info",
           "cp_type",
           "town",
+          "area",
           "address",
           "solve_type",
           "solve_plan",
@@ -928,7 +1030,7 @@ export default {
   height: 650px;
 }
 .pop-loc {
-  color: red;
+  color: rgb(19, 19, 18);
   font-size: 20px;
 }
 
