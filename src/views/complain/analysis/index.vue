@@ -1,77 +1,85 @@
 
 <template>
-  <div class="app">
+  <div class="app-container">
     <el-container>
-      <el-header class="top-step">
-        <div class="filter">
-          <el-date-picker
-            v-model="select_date"
-            format="yyyy 年 MM 月 dd 日"
-            value-format="yyyy-MM-dd"
-            :unlink-panels="true"
-            type="datetimerange"
-            :picker-options="pickerOptions"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            size="mini"
-            align="right"
-            @change="handleFilter"
-          />
-          <el-select
-            v-model="listQuery.city"
-            placeholder="县市"
-            style="width: 90px"
-            size="mini"
-            class="filter-item"
-            @change="handleFilter"
-          >
-            <el-option v-for="item in citys" :key="item" :label="item" :value="item" />
-          </el-select>
-        </div>
-      </el-header>
       <el-main>
-        <ve-line
-          :data="chartData"
-          :data-zoom="dataZoom"
-          :title="chartTitle"
-          :settings="chartSettings"
-          :mark-point="markPoint"
-          :toolbox="toolbox"
-          :loading="loading"
-          width="100%"
-        ></ve-line>
-        <!-- <ve-histogram
-      :title="chartTitle"
-      :data="chartData"
-      :data-zoom="dataZoom"
-      :settings="chartSettings"
-      :extend="extend"
-      :toolbox="toolbox"
-      width="100%"
-        ></ve-histogram>-->
-        <!-- <ve-map
-          :data="mapData"
-          :title="mapTitle"
-          :settings="mapSettings"
-          :extend="mapExtend"
-          height="800px"
-          width="600px"
-        ></ve-map>-->
-        <YiMapChart :data="mapData" :title="mapTitle" />
+        <div class="filter">
+          <YiFilter @filter="handleFilter" />
+        </div>
+        <el-tabs type="border-card">
+          <el-tab-pane label="落单投诉">
+            <el-row>
+              <el-col :span="9" class="v-divider">
+                <YiMapChart
+                  :data="mapData"
+                  :title="mapTitle"
+                  :settings="mapSettings"
+                  height="610px"
+                  width="480px"
+                />
+              </el-col>
+              <el-col :span="15">
+                <YiPieChart
+                  :data="pieData"
+                  :title="pieTitle"
+                  :settings="pieSettings"
+                  height="300px"
+                  width="420px"
+                />
+                <el-row>
+                  <el-col :span="12" class="h-divider">
+                    <YiHistogramChart
+                      :data="histogramData"
+                      :title="histogramTitle"
+                      :settings="histogramSettings"
+                      height="350px"
+                      width="400px"
+                    />
+                  </el-col>
+                  <el-col :span="12" class="h-divider"></el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+            <el-row class="h-divider">
+              <el-col :span="24">
+                <YiLineChart :data="chartData" :loading="loading" width="1400px" />
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <el-tab-pane label="广义投诉">
+            <YiLineChart
+              :data="allMonthData"
+              :title="allMonthTitle"
+              :settings="allMonthLineSettings"
+              data-zoom
+              height="300px"
+              width="800px"
+            />
+            <YiLineChart
+              :data="allDateData"
+              :title="allDateTitle"
+              :settings="allDateLineSettings"
+              data-zoom
+              height="300px"
+              width="800px"
+            />
+          </el-tab-pane>
+          <el-tab-pane label="热点投诉"></el-tab-pane>
+
+          <el-tab-pane label="报表输出"></el-tab-pane>
+        </el-tabs>
       </el-main>
     </el-container>
   </div>
 </template>
 
 <script>
-import VeLine from "v-charts/lib/line.common"; // 折线图
-import VeHistogram from "v-charts/lib/histogram.common"; // 柱状图
-// import VeMap from "v-charts/lib/map.common"; // 地图
 import YiMapChart from "@/components/Yi-MapChart";
+import YiLineChart from "@/components/Yi-LineChart";
+import YiPieChart from "@/components/Yi-PieChart";
+import YiHistogramChart from "@/components/Yi-HistogramChart"; // 柱状图
+import YiFilter from "@/components/Yi-Filter"; // 柱状图
 
-import "echarts/lib/component/markLine";
-import "echarts/lib/component/markPoint";
 import "echarts/lib/component/title"; // 标题
 import "echarts/lib/component/dataZoom"; // 设置区域缩放组件
 import "echarts/lib/component/toolbox"; // 工具箱
@@ -79,53 +87,14 @@ import "v-charts/lib/style.css"; // 使用loading属性前先引入css
 import { getDayData } from "@/api/chart.js";
 
 export default {
-  components: { VeLine, VeHistogram, YiMapChart },
+  components: {
+    YiLineChart,
+    YiMapChart,
+    YiPieChart,
+    YiHistogramChart,
+    YiFilter
+  },
   data() {
-    this.chartSettings = {
-      stack: { 县市: ["柯城", "衢江", "江山", "龙游", "常山", "开化"] }, // 堆叠柱状图,https://v-charts.js.org/#/histogram
-      area: true
-      // showLine: ["柯城"]
-      // metrics: ["柯城"] // 设置显示的指标维度，https://v-charts.js.org/#/data
-    };
-    this.chartTitle = {
-      left: "left",
-      subtext: "落单投诉",
-      text: "每日无线投诉量趋势"
-    };
-    // this.extend = {
-    //   series: {
-    //     label: { show: true, position: "top" }
-    //   }
-    // };
-    this.markLine = {
-      data: [
-        {
-          name: "平均线",
-          type: "average"
-        }
-      ]
-    };
-    this.markPoint = {
-      data: [
-        {
-          name: "最大值",
-          type: "max"
-        }
-      ]
-    };
-    this.dataZoom = [
-      {
-        type: "slider",
-        start: 0,
-        end: 180
-      }
-    ];
-    this.toolbox = {
-      feature: {
-        magicType: { type: ["line", "bar"] },
-        saveAsImage: {}
-      }
-    };
     // 地图设置
     this.mapSettings = {
       positionJsonLink:
@@ -135,10 +104,13 @@ export default {
         // edit data here such as:
         // json.features[0].properties.cp = [121.509062, 26.044332]
         return json;
+      },
+      labelMap: {
+        total: "投诉量"
       }
     };
     this.mapTitle = {
-      text: "分县市投诉量",
+      text: "4月截止8日无线投诉量",
       subtext: "狭义落单投诉"
     };
     this.mapExtend = {
@@ -153,55 +125,95 @@ export default {
         }
       }
     };
+    this.pieSettings = {
+      radius: 80 // 饼图大小
+    };
+    this.pieTitle = {
+      left: "center",
+      text: "4月截止8日无线投诉原因分类",
+      subtext: "狭义落单投诉"
+    };
+    this.histogramSettings = {
+      labelMap: {
+        duration: "平均历时"
+      }
+    };
+    this.histogramTitle = {
+      left: "center",
+      text: "无线投诉平均处理历时（小时）"
+    };
+    // 广义投诉月趋势
+    this.allMonthLineSettings = {
+      labelMap: {
+        lastyear: "2019年",
+        currentyear: "2020年"
+      }
+    };
+    this.allMonthTitle = {
+      left: "left",
+      text: "2019年~2020年广义无线投诉月趋势"
+    };
+    // 广义投诉日趋势
+    this.allDateTitle = {
+      left: "left",
+      text: "近90天广义无线投诉日趋势"
+    };
     return {
-      pickerOptions: {
-        shortcuts: [
-          {
-            text: "2020年至今",
-            onClick(picker) {
-              const start = new Date("2020-01-01 00:00:00"); // 转换为GMT格式
-              const end = new Date();
-              // alert(start + ";" + end);
-              picker.$emit("pick", [start, end]);
-            }
-          },
-          {
-            text: "2019年至今",
-            onClick(picker) {
-              const start = new Date("2019-01-01 00:00:00");
-              const end = new Date();
-              // start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit("pick", [start, end]);
-            }
-          },
-          {
-            text: "2018年至今",
-            onClick(picker) {
-              const start = new Date("2018-01-01 00:00:00");
-              const end = new Date();
-              picker.$emit("pick", [start, end]);
-            }
-          }
+      mapData: {
+        columns: ["city", "total"],
+        rows: [
+          { city: "柯城区", total: 24 },
+          { city: "衢江区", total: 17 },
+          { city: "江山市", total: 21 },
+          { city: "龙游县", total: 12 },
+          { city: "常山县", total: 9 },
+          { city: "开化县", total: 8 }
         ]
       },
-      select_date: "", // 查询的日期区间
-      citys: ["衢州", "柯城", "衢江", "江山", "龙游", "常山", "开化"],
-      mapData: {
-        columns: ["位置", " 投诉量"],
+      pieData: {
+        columns: ["日期", "访问用户"],
         rows: [
-          { 位置: "柯城区", " 投诉量": 24 },
-          { 位置: "衢江区", " 投诉量": 17 },
-          { 位置: "江山市", " 投诉量": 21 },
-          { 位置: "龙游县", " 投诉量": 12 },
-          { 位置: "常山县", " 投诉量": 9 },
-          { 位置: "开化县", " 投诉量": 8 }
+          { 日期: "弱覆盖", 访问用户: 56 },
+          { 日期: "高负荷", 访问用户: 32 },
+          { 日期: "现场测试正常", 访问用户: 13 },
+          { 日期: "设备故障", 访问用户: 6 },
+          { 日期: "隐性故障", 访问用户: 11 },
+          { 日期: "干扰", 访问用户: 3 }
+        ]
+      },
+      histogramData: {
+        columns: ["city", "duration"],
+        rows: [
+          { city: "柯城区", duration: 12.1 },
+          { city: "衢江区", duration: 13.2 },
+          { city: "江山市", duration: 16.3 },
+          { city: "龙游县", duration: 15.5 },
+          { city: "常山县", duration: 12.2 },
+          { city: "开化县", duration: 14.6 }
+        ]
+      },
+      allMonthData: {
+        columns: ["月份", "lastyear", "currentyear"],
+        rows: [
+          { 月份: "1月", lastyear: 2794, currentyear: 2238 },
+          { 月份: "2月", lastyear: 2211, currentyear: 1847 },
+          { 月份: "3月", lastyear: 2136, currentyear: 2327 },
+          { 月份: "4月", lastyear: 2419, currentyear: 0 },
+          { 月份: "5月", lastyear: 3017, currentyear: 0 },
+          { 月份: "6月", lastyear: 3216, currentyear: 0 },
+          { 月份: "7月", lastyear: 3474, currentyear: 0 },
+          { 月份: "8月", lastyear: 3069, currentyear: 0 },
+          { 月份: "9月", lastyear: 3393, currentyear: 0 },
+          { 月份: "10月", lastyear: 3352, currentyear: 0 },
+          { 月份: "11月", lastyear: 3085, currentyear: 0 },
+          { 月份: "12月", lastyear: 2703, currentyear: 0 }
         ]
       },
       listQuery: {
         // 查询参数
         city: "衢州",
-        month: "",
-        year: "",
+        // month: "",
+        // year: "",
         start_date: "2019-06-01",
         end_date: "2019-08-30"
       },
@@ -212,8 +224,15 @@ export default {
   created() {
     this.getDate();
     this.getDayChart();
+    this.getdate();
   },
   methods: {
+    getdate() {
+      // const end = new Date();
+      // // const start = new Date();
+      // const start = end.getFullYear() + "-0" + end.getMonth() + "-01"; // 拼接为当月第一天
+      // // alert(start);
+    },
     // 查询日期初始化，近三个月
     getDate() {
       const end = new Date("2019-06-01 00:00:00");
@@ -226,9 +245,9 @@ export default {
       this.listQuery.end_date = end.toLocaleDateString().replace(/\//g, "-");
     },
     // 条件过滤
-    handleFilter() {
-      // this.listQuery.start_date = this.select_date[0];
-      // this.listQuery.end_date = this.select_date[1];
+    handleFilter(data) {
+      // console.log(data);
+      this.listQuery = data;
       this.getDayChart();
     },
 
@@ -249,5 +268,20 @@ export default {
 <style scoped>
 .app {
   padding-top: 40px;
+}
+.filter {
+  padding-bottom: 10px;
+}
+.v-divider {
+  border-right: dashed 1px #dcdfe6;
+}
+.h-divider {
+  margin-top: 5px;
+  padding-top: 10px;
+  border-top: dashed 1px #dcdfe6;
+}
+.chart-right {
+  /* margin-left: 20px; */
+  padding-left: 20px;
 }
 </style>
