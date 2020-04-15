@@ -8,7 +8,7 @@
         </div>
         <el-tabs type="border-card">
           <el-tab-pane label="落单投诉">
-            <el-row>
+            <el-row :gutter="20">
               <el-col :span="9" class="v-divider">
                 <YiMapChart
                   :data="mapData"
@@ -18,7 +18,7 @@
                   width="480px"
                 />
               </el-col>
-              <el-col :span="15">
+              <el-col :span="8" class="v-divider">
                 <YiPieChart
                   :data="pieData"
                   :title="pieTitle"
@@ -26,45 +26,100 @@
                   height="300px"
                   width="420px"
                 />
-                <el-row>
-                  <el-col :span="12" class="h-divider">
-                    <YiHistogramChart
-                      :data="histogramData"
-                      :title="histogramTitle"
-                      :settings="histogramSettings"
-                      height="350px"
-                      width="400px"
-                    />
-                  </el-col>
-                  <el-col :span="12" class="h-divider"></el-col>
-                </el-row>
+                <div class="top-padding h-divider">
+                  <YiPieChart
+                    :data="pieData"
+                    :title="pieTitle"
+                    :settings="pieSettings"
+                    height="300px"
+                    width="420px"
+                  />
+                </div>
+              </el-col>
+              <el-col :span="7">
+                <YiHistogramChart
+                  :data="histogramData"
+                  :title="histogramTitle"
+                  :settings="histogramSettings"
+                  height="300px"
+                  width="400px"
+                />
+                <div class="top-padding h-divider">
+                  <YiHistogramChart
+                    :data="histogramData"
+                    :title="histogramTitle"
+                    :settings="histogramSettings"
+                    height="300px"
+                    width="400px"
+                  />
+                </div>
               </el-col>
             </el-row>
-            <el-row class="h-divider">
-              <el-col :span="24">
-                <YiLineChart :data="chartData" :loading="loading" width="1400px" />
+            <el-row class="h-divider" :gutter="20">
+              <el-col :span="12" class="v-divider">
+                <YiLineChart
+                  :data="chartData"
+                  :extend="lineExtend"
+                  :loading="loading"
+                  width="700px"
+                />
+              </el-col>
+              <el-col :span="12">
+                <YiLineChart
+                  :data="chartData"
+                  :extend="lineExtend"
+                  :loading="loading"
+                  width="700px"
+                />
               </el-col>
             </el-row>
           </el-tab-pane>
           <el-tab-pane label="广义投诉">
-            <YiLineChart
-              :data="allMonthData"
-              :title="allMonthTitle"
-              :settings="allMonthLineSettings"
-              data-zoom
-              height="300px"
-              width="800px"
-            />
-            <YiLineChart
-              :data="allDateData"
-              :title="allDateTitle"
-              :settings="allDateLineSettings"
-              data-zoom
-              height="300px"
-              width="800px"
-            />
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <YiLineChart
+                  :data="allMonthData"
+                  :title="allMonthTitle"
+                  :settings="allMonthLineSettings"
+                  data-zoom
+                  height="300px"
+                  width="600px"
+                />
+              </el-col>
+              <el-col :span="12">
+                <YiLineChart
+                  :data="allDateData"
+                  :title="allDateTitle"
+                  :settings="allDateLineSettings"
+                  data-zoom
+                  height="300px"
+                  width="600px"
+                />
+              </el-col>
+            </el-row>
           </el-tab-pane>
-          <el-tab-pane label="热点投诉"></el-tab-pane>
+          <el-tab-pane label="热点投诉">
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-card class="box-card">
+                  <div slot="header" class="clearfix">
+                    <span>重复用户</span>
+                    <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
+                  </div>
+                  <div v-for="o in 4" :key="o" class="text item">{{ '列表内容 ' + o }}</div>
+                </el-card>
+              </el-col>
+              <el-col :span="12">
+                <el-card class="box-card">
+                  <div slot="header" class="clearfix">
+                    <span>热点区域</span>
+                    <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
+                  </div>
+                  <div v-for="o in 4" :key="o" class="text item">{{ '列表内容 ' + o }}</div>
+                </el-card>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
 
           <el-tab-pane label="报表输出"></el-tab-pane>
         </el-tabs>
@@ -135,13 +190,29 @@ export default {
     };
     this.histogramSettings = {
       labelMap: {
-        duration: "平均历时"
-      }
+        duration: "平均历时（小时)",
+        overtime: "超时24小时工单（单）"
+      },
+      showLine: ["duration"]
     };
     this.histogramTitle = {
       left: "center",
-      text: "无线投诉平均处理历时（小时）"
+      text: "无线投诉现场处理平均历时"
     };
+    this.lineExtend = {
+      // 图例显示位置
+      legend: {
+        // bottom: "20"
+        top: "30",
+        right: "50"
+      },
+      // 去除分隔线
+      // https://www.echartsjs.com/zh/option.html#xAxis.splitLine
+      yAxis: {
+        splitLine: { show: false }
+      }
+    };
+
     // 广义投诉月趋势
     this.allMonthLineSettings = {
       labelMap: {
@@ -171,25 +242,25 @@ export default {
         ]
       },
       pieData: {
-        columns: ["日期", "访问用户"],
+        columns: ["分类", "数量"],
         rows: [
-          { 日期: "弱覆盖", 访问用户: 56 },
-          { 日期: "高负荷", 访问用户: 32 },
-          { 日期: "现场测试正常", 访问用户: 13 },
-          { 日期: "设备故障", 访问用户: 6 },
-          { 日期: "隐性故障", 访问用户: 11 },
-          { 日期: "干扰", 访问用户: 3 }
+          { 分类: "弱覆盖", 数量: 56 },
+          { 分类: "高负荷", 数量: 32 },
+          { 分类: "现场测试正常", 数量: 13 },
+          { 分类: "设备故障", 数量: 6 },
+          { 分类: "隐性故障", 数量: 11 },
+          { 分类: "干扰", 数量: 3 }
         ]
       },
       histogramData: {
-        columns: ["city", "duration"],
+        columns: ["city", "duration", "overtime"],
         rows: [
-          { city: "柯城区", duration: 12.1 },
-          { city: "衢江区", duration: 13.2 },
-          { city: "江山市", duration: 16.3 },
-          { city: "龙游县", duration: 15.5 },
-          { city: "常山县", duration: 12.2 },
-          { city: "开化县", duration: 14.6 }
+          { city: "柯城区", duration: 12.1, overtime: 0 },
+          { city: "衢江区", duration: 13.2, overtime: 2 },
+          { city: "江山市", duration: 16.3, overtime: 1 },
+          { city: "龙游县", duration: 15.5, overtime: 0 },
+          { city: "常山县", duration: 12.2, overtime: 0 },
+          { city: "开化县", duration: 14.6, overtime: 2 }
         ]
       },
       allMonthData: {
@@ -266,8 +337,11 @@ export default {
 };
 </script>
 <style scoped>
-.app {
-  padding-top: 40px;
+.top-padding {
+  margin-top: 20px;
+}
+.bg {
+  background-color: rgb(240, 242, 245);
 }
 .filter {
   padding-bottom: 10px;

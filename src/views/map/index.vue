@@ -992,6 +992,7 @@ h3.title {
         scrollbar-face-color: seagreen;
         scrollbar-arrow-color: skyblue;
 
+        // 弹窗边框阴影样式
         .row {
           float: left;
           width: 320px;

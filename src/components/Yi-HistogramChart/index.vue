@@ -75,7 +75,12 @@ export default {
     };
     // 显示值
     this.extend = {
+      // 图例显示位置
+      legend: {
+        bottom: "20"
+      },
       series: {
+        // 柱状图上方显示具体数值
         label: { show: true, position: "top" }
       },
       // 去除分隔线

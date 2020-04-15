@@ -1,8 +1,23 @@
 <template>
-  <div class="dashboard-editor-container">
+  <div class="dashboard-editor-container my">
     <!-- <github-corner class="github-corner" /> -->
-
-    <panel-group @handleSetLineChartData="handleSetLineChartData" />
+    <el-collapse v-model="activeNames" accordion>
+      <el-collapse-item name="1">
+        <template slot="title">
+          <i class="header-icon el-icon-menu"></i>
+          网络运行概况
+        </template>
+        <panel-group @handleSetLineChartData="handleSetLineChartData" />
+      </el-collapse-item>
+      <el-collapse-item name="2">
+        <template slot="title">
+          <i class="header-icon el-icon-s-data"></i>
+          可视化图表展示
+        </template>
+        <!-- <div>控制反馈：通过界面样式和交互动效让用户可以清晰的感知自己的操作；</div>
+        <div>页面反馈：操作后，通过页面元素的变化清晰地展现当前状态。</div>-->
+      </el-collapse-item>
+    </el-collapse>
 
     <!-- <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
       <line-chart :chart-data="lineChartData" />
@@ -49,6 +64,11 @@ export default {
   components: {
     PanelGroup
   },
+  data() {
+    return {
+      activeNames: ["1"]
+    };
+  },
   computed: {
     ...mapGetters(["name"])
   }
@@ -71,7 +91,7 @@ export default {
   .chart-wrapper {
     background: #fff;
     padding: 16px 16px 0;
-    margin-bottom: 32px;
+    // margin-bottom: 32px;
   }
 }
 
@@ -79,5 +99,24 @@ export default {
   .chart-wrapper {
     padding: 8px;
   }
+}
+
+.my /deep/ .el-collapse-item__header {
+  // background-color: #409eff;
+  border: 1px solid #ebeef5;
+  border-radius: 5px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  color: gray;
+  font-weight: bolder;
+  padding-left: 20px;
+}
+.el-icon-menu {
+  // color: #409eff;
+  padding-right: 10px;
+}
+.el-icon-s-data {
+  // color: #67c23a;
+  padding-right: 10px;
 }
 </style>

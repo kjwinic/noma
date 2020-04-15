@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
-    <el-divider>
+    <!-- <el-divider>
       <i class="el-icon-view"></i>
       <span>故障投诉</span>
-    </el-divider>
+    </el-divider>-->
     <el-row :gutter="40" class="panel-group">
       <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
         <div class="card-panel" @click="gotoComplain">
@@ -102,10 +102,10 @@
         </div>
       </el-col>
     </el-row>
-    <el-divider class="my">
+    <!-- <el-divider class="my">
       <i class="el-icon-search"></i>
       <span>运维管理</span>
-    </el-divider>
+    </el-divider>-->
     <el-row :gutter="40" class="panel-group">
       <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
         <div class="card-panel" @click="handleSetLineChartData('newVisitis')">

@@ -47,6 +47,12 @@ export default {
         return [{}];
       }
     },
+    extend: {
+      type: Object,
+      default() {
+        return [{}];
+      }
+    },
     dataZoom: {
       type: Object,
       default() {
@@ -76,13 +82,8 @@ export default {
     this.title = {
       left: "left",
       subtext: "落单投诉",
-      text: "每日无线投诉量趋势"
+      text: "无线落单投诉量日趋势"
     };
-    // this.extend = {
-    //   series: {
-    //     label: { show: true, position: "top" }
-    //   }
-    // };
     this.markLine = {
       data: [
         {
@@ -113,6 +114,12 @@ export default {
       }
     };
     this.extend = {
+      // 图例显示位置
+      legend: {
+        // bottom: "20"
+        // top: "30",
+        right: "80"
+      },
       // series: {
       //   label: { show: true, position: "top" }
       // },
