@@ -5,7 +5,7 @@
     :data="data"
     :title="title"
     :settings="settings"
-    :visualMap="visualMap"
+    :visual-map="visualMap"
     :toolbox="toolbox"
     :extend="extend"
     :legend-visible="false"
