@@ -135,8 +135,10 @@ export default {
   data() {
     // 地图设置
     this.mapSettings = {
-      positionJsonLink:
-        "https://geo.datav.aliyun.com/areas_v2/bound/330800_full.json",
+      // positionJsonLink:
+      // "https://geo.datav.aliyun.com/areas_v2/bound/330800_full.json",
+      // positionJsonLink: "./static/quzhu.json",
+      positionJsonLink: "http://localhost:9528/static/quzhou.json",
       position: "QZ",
       beforeRegisterMap(json) {
         // edit data here such as:

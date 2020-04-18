@@ -6,7 +6,7 @@
         <div class="filter">
           <YiFilter @filter="handleFilter" />
         </div>
-        <el-tabs type="border-card">
+        <el-tabs type="border-card" @tab-click="tabChange">
           <el-tab-pane label="落单投诉概况">
             <el-row :gutter="20">
               <el-col :span="9" class="v-divider">
@@ -131,8 +131,8 @@ export default {
   data() {
     // 地图设置
     this.mapSettings = {
-      positionJsonLink:
-        "https://geo.datav.aliyun.com/areas_v2/bound/330800_full.json",
+      positionJsonLink: "http://localhost:9528/static/quzhou.json",
+      // "https://geo.datav.aliyun.com/areas_v2/bound/330800_full.json",
       position: "QZ",
       beforeRegisterMap(json) {
         // edit data here such as:
@@ -264,8 +264,8 @@ export default {
         city: "衢州",
         // month: "",
         // year: "",
-        start_date: "2019-06-01",
-        end_date: "2019-08-30"
+        start_date: "2020-01-01",
+        end_date: "2020-03-30"
       },
       chartData: {}, // 图表数据
       loading: false
@@ -273,20 +273,38 @@ export default {
   },
   created() {
     this.getDate();
-    this.getDayChart();
-    this.getdate();
+    // this.getDayChart();
+    // this.getdate();
   },
   methods: {
-    getdate() {
-      // const end = new Date();
-      // // const start = new Date();
-      // const start = end.getFullYear() + "-0" + end.getMonth() + "-01"; // 拼接为当月第一天
-      // // alert(start);
+    // 切换tab页
+    tabChange(e) {
+      // alert(e.index);
+      switch (e.index) {
+        case "0":
+          // this.getSites();
+          break;
+        case "1":
+          this.getDayChart();
+          break;
+        case "2":
+          // this.getPaths();
+          break;
+        case "3":
+          // this.getImages();
+          break;
+      }
     },
+    // getdate() {
+    //   const end = new Date();
+    //   // const start = new Date();
+    //   const start = end.getFullYear() + "-0" + end.getMonth() + "-01"; // 拼接为当月第一天
+    //   // alert(start);
+    // },
     // 查询日期初始化，近三个月
     getDate() {
-      const end = new Date("2019-06-01 00:00:00");
-      const start = new Date("2019-06-01 00:00:00");
+      const end = new Date();
+      const start = new Date();
       // 近三个月
       start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
       this.listQuery.start_date = start
