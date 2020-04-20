@@ -99,7 +99,117 @@
             </el-row>
           </el-tab-pane>
 
-          <el-tab-pane label="报表输出"></el-tab-pane>
+          <el-tab-pane v-loading="tableLoading" label="报表输出" element-loading-text="加载中">
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-card class="box-card">
+                  <div slot="header" class="clearfix">
+                    <span>分县市投诉量{{ timeInterval }}</span>
+                    <el-button style="float: right; padding: 3px 0" type="text">下载表格</el-button>
+                  </div>
+                  <el-table
+                    :data="tableData.list1"
+                    :cell-class-name="cellColor"
+                    align="center"
+                    style="width:100%;height:450px;font-size:12px"
+                  >
+                    <el-table-column prop="city" label="县市" width="50px" />
+                    <el-table-column prop="tousunum" label="投诉数量" align="center" width="50px" />
+                    <el-table-column
+                      prop="zhanbi"
+                      label="投诉量占比"
+                      :formatter="stateFormat"
+                      align="center"
+                      width="70px"
+                    />
+                    <el-table-column prop="citynum" label="城区投诉数量" align="center" width="70px" />
+                    <el-table-column
+                      prop="cityzhanbi"
+                      label="城区投诉占比"
+                      :formatter="stateFormat"
+                      align="center"
+                      width="70px"
+                    />
+                    <el-table-column prop="countrynum" label="农村投诉数量" align="center" width="70px" />
+                    <el-table-column
+                      prop="countryzhanbi"
+                      label="农村投诉占比"
+                      :formatter="stateFormat"
+                      align="center"
+                      width="70px"
+                    />
+                    <el-table-column prop="jiejuenum" label="已解决数量" align="center" width="70px" />
+                    <el-table-column
+                      prop="jiejuelv"
+                      label="解决率"
+                      :formatter="stateFormat"
+                      align="center"
+                      width="70px"
+                    />
+                  </el-table>
+                </el-card>
+              </el-col>
+              <el-col :span="12">
+                <el-card class="box-card">
+                  <div slot="header" class="clearfix">
+                    <span>投诉原因分类{{ timeInterval }}</span>
+                    <el-button style="float: right; padding: 3px 0" type="text">下载表格</el-button>
+                  </div>
+                  <el-table
+                    :data="tableData.list2"
+                    style="width:100%;height:450px;font-size:12px"
+                    max-height="450"
+                  >
+                    <el-table-column prop="classify" label="原因分类" />
+                    <el-table-column prop="tousunum" label="投诉量" />
+                    <el-table-column prop="zhanbi" sortable label="占比" :formatter="stateFormat" />
+                    <el-table-column prop="kecheng" :formatter="stateFormat" label="柯城" />
+                    <el-table-column prop="qujiang" :formatter="stateFormat" label="衢江" />
+                    <el-table-column prop="jiangshan" :formatter="stateFormat" label="江山" />
+                    <el-table-column prop="longyou" :formatter="stateFormat" label="龙游" />
+                    <el-table-column prop="chanshan" :formatter="stateFormat" label="常山" />
+                    <el-table-column prop="kaihua" :formatter="stateFormat" label="开化" />
+                    <el-table-column prop="jiejuelv" label="解决率" sortable :formatter="stateFormat" />
+                  </el-table>
+                </el-card>
+              </el-col>
+            </el-row>
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-card class="box-card">
+                  <div slot="header" class="clearfix">
+                    <span>投诉场景分类{{ timeInterval }}</span>
+                    <el-button style="float: right; padding: 3px 0" type="text">下载表格</el-button>
+                  </div>
+                  <el-table
+                    :data="tableData.list3"
+                    style="width:100%;font-size:12px"
+                    max-height="450"
+                  >
+                    <el-table-column prop="classify" label="投诉场景" />
+                    <el-table-column prop="tousunum" label="投诉量" />
+                    <el-table-column prop="zhanbi" sortable label="占比" :formatter="stateFormat" />
+                    <el-table-column prop="kecheng" :formatter="stateFormat" label="柯城" />
+                    <el-table-column prop="qujiang" :formatter="stateFormat" label="衢江" />
+                    <el-table-column prop="jiangshan" :formatter="stateFormat" label="江山" />
+                    <el-table-column prop="longyou" :formatter="stateFormat" label="龙游" />
+                    <el-table-column prop="chanshan" label="常山" :formatter="stateFormat" />
+                    <el-table-column prop="kaihua" :formatter="stateFormat" label="开化" />
+                    <el-table-column prop="jiejuelv" label="解决率" sortable :formatter="stateFormat" />
+                  </el-table>
+                </el-card>
+              </el-col>
+              <el-col :span="12">
+                <el-card class="box-card">
+                  <div slot="header" class="clearfix">
+                    <span>弱覆盖解决情况{{ timeInterval }}</span>
+                    <el-button style="float: right; padding: 3px 0" type="text">下载表格</el-button>
+                  </div>
+                  <div v-for="o in 4" :key="o" class="text item">{{ '列表内容 ' + o }}</div>
+                </el-card>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
         </el-tabs>
       </el-main>
     </el-container>
@@ -117,7 +227,7 @@ import "echarts/lib/component/title"; // 标题
 import "echarts/lib/component/dataZoom"; // 设置区域缩放组件
 import "echarts/lib/component/toolbox"; // 工具箱
 import "v-charts/lib/style.css"; // 使用loading属性前先引入css
-import { getDayData } from "@/api/chart.js";
+import { getDayData, getTableData } from "@/api/complain-chart.js";
 
 export default {
   name: "ComplainWorkorder",
@@ -267,12 +377,17 @@ export default {
         start_date: "2020-01-01",
         end_date: "2020-03-30"
       },
+      timeInterval: "", // 数据时间区间
       chartData: {}, // 图表数据
-      loading: false
+      loading: false,
+      tableData: {},
+      tableLoading: false
     };
   },
   created() {
     this.getDate();
+    this.timeInterval =
+      "（" + this.listQuery.start_date + " ~ " + this.listQuery.end_date + "）";
     // this.getDayChart();
     // this.getdate();
   },
@@ -291,9 +406,33 @@ export default {
           // this.getPaths();
           break;
         case "3":
-          // this.getImages();
+          this.getTable();
           break;
       }
+    },
+    getTable() {
+      this.tableLoading = true;
+      getTableData(this.listQuery)
+        .then(res => {
+          console.log(res);
+          this.tableData = res;
+          this.tableLoading = false;
+        })
+        .catch(res => {
+          this.tableLoading = false;
+        });
+    },
+    // 格式化表格
+    stateFormat(row, column) {
+      if (row[column.property] !== "/") {
+        var string = String(row[column.property] * 100).substr(0, 5) + "%";
+        return string;
+      } else {
+        return "/";
+      }
+    },
+    headerStyle({ row, column, rowIndex, columnIndex }) {
+      return "table-header";
     },
     // getdate() {
     //   const end = new Date();
@@ -317,6 +456,7 @@ export default {
       // console.log(data);
       this.listQuery = data;
       this.getDayChart();
+      this.getTable();
     },
 
     getDayChart() {
@@ -333,7 +473,7 @@ export default {
   }
 };
 </script>
-<style scoped>
+<style>
 .top-padding {
   margin-top: 20px;
 }
@@ -355,4 +495,13 @@ export default {
   /* margin-left: 20px; */
   padding-left: 20px;
 }
+.el-card__header {
+  background: #0257b9;
+  color: white;
+}
+/* .headerStyle {
+  background-color: #1989fa !important;
+  color: #fff;
+  font-weight: 400;
+} */
 </style>

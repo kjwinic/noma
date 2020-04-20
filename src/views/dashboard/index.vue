@@ -71,6 +71,11 @@ export default {
   },
   computed: {
     ...mapGetters(["name"])
+  },
+  methods: {
+    handleSetLineChartData() {
+      console.log("hello");
+    }
   }
 };
 </script>

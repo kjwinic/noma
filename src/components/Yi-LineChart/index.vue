@@ -100,13 +100,11 @@ export default {
         }
       ]
     };
-    this.dataZoom = [
-      {
-        type: "slider",
-        start: 0,
-        end: 180
-      }
-    ];
+    this.dataZoom = {
+      type: "slider",
+      start: 0,
+      end: 180
+    };
     this.toolbox = {
       feature: {
         magicType: { type: ["line", "bar"] },

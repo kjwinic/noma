@@ -121,7 +121,7 @@ import "echarts/lib/component/title"; // 标题
 import "echarts/lib/component/dataZoom"; // 设置区域缩放组件
 import "echarts/lib/component/toolbox"; // 工具箱
 import "v-charts/lib/style.css"; // 使用loading属性前先引入css
-import { getDayData } from "@/api/chart.js";
+import { getDayData } from "@/api/complain-chart.js";
 
 export default {
   name: "ComplainAll",
