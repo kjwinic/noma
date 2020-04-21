@@ -4,22 +4,29 @@
     <el-container>
       <el-main>
         <div class="filter">
-          <YiFilter @filter="handleFilter" />
+          <YiFilter @query="handleQuery" @filter="handleFilter" />
         </div>
         <el-tabs type="border-card" @tab-click="tabChange">
           <el-tab-pane label="落单投诉概况">
             <el-row :gutter="20">
               <el-col :span="9" class="v-divider">
                 <YiMapChart
+                  v-loading="loading"
+                  element-loading-text="地图加载中"
                   :data="mapData"
                   :title="mapTitle"
                   :settings="mapSettings"
+                  :visual-map="visualMap"
+                  :extend="mapExtend"
                   height="610px"
                   width="480px"
+                  @filter="handleFilter"
                 />
               </el-col>
               <el-col :span="8" class="v-divider">
                 <YiPieChart
+                  v-loading="loading"
+                  element-loading-text="数据加载中"
                   :data="pieData"
                   :title="pieTitle"
                   :settings="pieSettings"
@@ -28,8 +35,10 @@
                 />
                 <div class="top-padding h-divider">
                   <YiPieChart
-                    :data="pieData"
-                    :title="pieTitle"
+                    v-loading="loading"
+                    element-loading-text="数据加载中"
+                    :data="pieData2"
+                    :title="pieTitle2"
                     :settings="pieSettings"
                     height="300px"
                     width="420px"
@@ -108,13 +117,12 @@
                     <el-button style="float: right; padding: 3px 0" type="text">下载表格</el-button>
                   </div>
                   <el-table
-                    :data="tableData.list1"
-                    :cell-class-name="cellColor"
+                    :data="allData.list1"
                     align="center"
                     style="width:100%;height:450px;font-size:12px"
                   >
                     <el-table-column prop="city" label="县市" width="50px" />
-                    <el-table-column prop="tousunum" label="投诉数量" align="center" width="50px" />
+                    <el-table-column prop="total" label="投诉数量" align="center" width="50px" />
                     <el-table-column
                       prop="zhanbi"
                       label="投诉量占比"
@@ -156,12 +164,12 @@
                     <el-button style="float: right; padding: 3px 0" type="text">下载表格</el-button>
                   </div>
                   <el-table
-                    :data="tableData.list2"
+                    :data="allData.list2"
                     style="width:100%;height:450px;font-size:12px"
                     max-height="450"
                   >
                     <el-table-column prop="classify" label="原因分类" />
-                    <el-table-column prop="tousunum" label="投诉量" />
+                    <el-table-column prop="total" label="投诉量" />
                     <el-table-column prop="zhanbi" sortable label="占比" :formatter="stateFormat" />
                     <el-table-column prop="kecheng" :formatter="stateFormat" label="柯城" />
                     <el-table-column prop="qujiang" :formatter="stateFormat" label="衢江" />
@@ -182,12 +190,12 @@
                     <el-button style="float: right; padding: 3px 0" type="text">下载表格</el-button>
                   </div>
                   <el-table
-                    :data="tableData.list3"
+                    :data="allData.list3"
                     style="width:100%;font-size:12px"
                     max-height="450"
                   >
                     <el-table-column prop="classify" label="投诉场景" />
-                    <el-table-column prop="tousunum" label="投诉量" />
+                    <el-table-column prop="total" label="投诉量" />
                     <el-table-column prop="zhanbi" sortable label="占比" :formatter="stateFormat" />
                     <el-table-column prop="kecheng" :formatter="stateFormat" label="柯城" />
                     <el-table-column prop="qujiang" :formatter="stateFormat" label="衢江" />
@@ -227,7 +235,8 @@ import "echarts/lib/component/title"; // 标题
 import "echarts/lib/component/dataZoom"; // 设置区域缩放组件
 import "echarts/lib/component/toolbox"; // 工具箱
 import "v-charts/lib/style.css"; // 使用loading属性前先引入css
-import { getDayData, getTableData } from "@/api/complain-chart.js";
+import { getDayData, getAllData } from "@/api/complain-chart.js";
+import { formatDate } from "@/utils/getDate.js";
 
 export default {
   name: "ComplainWorkorder",
@@ -254,27 +263,51 @@ export default {
       }
     };
     this.mapTitle = {
-      text: "4月截止8日无线投诉量",
+      text: "分县市无线投诉量",
       subtext: "狭义落单投诉"
     };
     this.mapExtend = {
       series: {
         nameMap: {
-          kechengqu: "柯城",
-          qujiangqu: "衢江",
-          changshanxian: "常山",
-          jiangshanshi: "江山",
-          kaihuaxian: "开化",
-          longyouxian: "龙游"
+          柯城区: "柯城",
+          衢江区: "衢江",
+          常山县: "常山",
+          江山市: "江山",
+          开化县: "开化",
+          龙游县: "龙游"
+        },
+        label: {
+          normal: {
+            show: true,
+            position: "inner", // 标签的位置
+            formatter: "{b}\n\n{c}起" // 设置显示格式，中间换行
+          }
         }
       }
     };
+    this.visualMap = {
+      left: "left", // 水平位置
+      top: "70%", // 垂直位置
+      min: 5,
+      max: 30,
+      splitNumber: 5, // 区间分段数量
+      color: ["orangered", "yellow", "lightskyblue"],
+      textStyle: {
+        color: "#333"
+      }
+    };
     this.pieSettings = {
-      radius: 80 // 饼图大小
+      radius: 80, // 饼图大小
+      limitShowNum: 5
     };
     this.pieTitle = {
-      left: "center",
-      text: "4月截止8日无线投诉原因分类",
+      left: "left",
+      text: "全市无线投诉原因分类",
+      subtext: "狭义落单投诉"
+    };
+    this.pieTitle2 = {
+      left: "left",
+      text: "全市无线投诉场景分类",
       subtext: "狭义落单投诉"
     };
     this.histogramSettings = {
@@ -322,25 +355,26 @@ export default {
       mapData: {
         columns: ["city", "total"],
         rows: [
-          { city: "柯城区", total: 24 },
-          { city: "衢江区", total: 17 },
-          { city: "江山市", total: 21 },
-          { city: "龙游县", total: 12 },
-          { city: "常山县", total: 9 },
-          { city: "开化县", total: 8 }
+          { city: "柯城", total: 34 },
+          { city: "衢江", total: 17 },
+          { city: "江山", total: 21 },
+          { city: "龙游", total: 12 },
+          { city: "常山", total: 9 },
+          { city: "开化", total: 8 }
         ]
       },
       pieData: {
-        columns: ["分类", "数量"],
+        columns: ["classify", "total"],
         rows: [
-          { 分类: "弱覆盖", 数量: 56 },
-          { 分类: "高负荷", 数量: 32 },
-          { 分类: "现场测试正常", 数量: 13 },
-          { 分类: "设备故障", 数量: 6 },
-          { 分类: "隐性故障", 数量: 11 },
-          { 分类: "干扰", 数量: 3 }
+          { classify: "弱覆盖", total: 56 },
+          { classify: "高负荷", total: 32 },
+          { classify: "现场测试正常", total: 13 },
+          { classify: "设备故障", total: 6 },
+          { classify: "隐性故障", total: 11 },
+          { classify: "干扰", total: 3 }
         ]
       },
+      pieData2: { columns: ["classify", "total"], rows: [] },
       histogramData: {
         columns: ["city", "duration", "overtime"],
         rows: [
@@ -380,7 +414,7 @@ export default {
       timeInterval: "", // 数据时间区间
       chartData: {}, // 图表数据
       loading: false,
-      tableData: {},
+      allData: {},
       tableLoading: false
     };
   },
@@ -388,10 +422,125 @@ export default {
     this.getDate();
     this.timeInterval =
       "（" + this.listQuery.start_date + " ~ " + this.listQuery.end_date + "）";
+    this.getChartData();
+
     // this.getDayChart();
     // this.getdate();
   },
   methods: {
+    getDate() {
+      const end = new Date();
+      // const start = new Date();
+      var start = new Date(end.getFullYear(), end.getMonth(), 1); // 构造当月第一天
+      this.listQuery.start_date = formatDate(start);
+      this.listQuery.end_date = formatDate(end);
+    },
+    // 查询日期初始化，近三个月
+    // getDate() {
+    //   const end = new Date();
+    //   const start = new Date();
+    //   // 近三个月
+    //   start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+    //   this.listQuery.start_date = start
+    //     .toLocaleDateString()
+    //     .replace(/\//g, "-"); // 转换为"2020-03-13"格式
+    //   this.listQuery.end_date = end.toLocaleDateString().replace(/\//g, "-");
+    // },
+    // 数据库查询
+    handleQuery(data) {
+      // console.log(data);
+      this.listQuery = data;
+      this.getDayChart();
+      this.getChartData();
+      // this.initChart();
+    },
+    // 条件过滤
+    handleFilter(data) {
+      // alert(data);
+      // 无线投诉原因分类，按照县市条件过滤
+      switch (data) {
+        case "衢州":
+          this.pieData.columns = ["classify", "total"];
+          this.pieTitle.text = "全市无线投诉原因分类";
+          this.pieData2.columns = ["classify", "total"];
+          this.pieTitle2.text = "全市无线投诉场景分类";
+          break;
+        case "柯城":
+          this.pieData.columns = ["classify", "kc"];
+          this.pieTitle.text = "无线投诉原因分类（柯城）";
+          this.pieData2.columns = ["classify", "kc"];
+          this.pieTitle2.text = "无线投诉场景分类（柯城）";
+          break;
+        case "衢江":
+          this.pieData.columns = ["classify", "qj"];
+          this.pieTitle.text = "无线投诉原因分类（衢江）";
+          this.pieData2.columns = ["classify", "qj"];
+          this.pieTitle2.text = "无线投诉场景分类（衢江）";
+          break;
+        case "江山":
+          this.pieData.columns = ["classify", "js"];
+          this.pieTitle.text = "无线投诉原因分类（江山）";
+          this.pieData2.columns = ["classify", "js"];
+          this.pieTitle2.text = "无线投诉场景分类（江山）";
+          break;
+        case "龙游":
+          this.pieData.columns = ["classify", "ly"];
+          this.pieTitle.text = "无线投诉原因分类（龙游）";
+          this.pieData2.columns = ["classify", "ly"];
+          this.pieTitle2.text = "无线投诉场景分类（龙游）";
+          break;
+        case "常山":
+          this.pieData.columns = ["classify", "cs"];
+          this.pieTitle.text = "无线投诉原因分类（常山）";
+          this.pieData2.columns = ["classify", "cs"];
+          this.pieTitle2.text = "无线投诉场景分类（常山）";
+          break;
+        case "开化":
+          this.pieData.columns = ["classify", "kh"];
+          this.pieTitle.text = "无线投诉原因分类（开化）";
+          this.pieData2.columns = ["classify", "kh"];
+          this.pieTitle2.text = "无线投诉场景分类（开化）";
+          break;
+      }
+      // 无线投诉场景分类，按照县市条件过滤
+    },
+    // 获取地图图例最大最小值
+    getDataMaxmin() {
+      var data = this.mapData.rows;
+      // console.log(data);
+      var max = data[0].total;
+      var min = data[0].total;
+      for (var i = 0; i < data.length - 3; i++) {
+        max = max < data[i + 1].total ? data[i + 1].total : max;
+        min = min > data[i + 1].total ? data[i + 1].total : min;
+      }
+      // console.log(max);
+      max = Math.ceil(max / 10) * 10; // 向上取整
+      min = Math.floor(min / 10) * 10; // 向下取整
+      // console.log(max);
+      this.visualMap.max = max; // 设置图例最大值
+      this.visualMap.min = min; // 设置图例最小值
+    },
+    initChart() {
+      // 图标标题时间区间
+      this.timeInterval =
+        "（" +
+        this.listQuery.start_date +
+        " ~ " +
+        this.listQuery.end_date +
+        "）";
+      this.mapTitle.subtext = this.timeInterval;
+      this.getDataMaxmin(); // 设置图例区间
+      // 饼图
+      this.pieTitle.subtext = this.timeInterval;
+      this.pieTitle2.subtext = this.timeInterval;
+      this.$notify({
+        title: "提醒",
+        message: "查询成功",
+        type: "success",
+        duration: 2000
+      });
+    },
     // 切换tab页
     tabChange(e) {
       // alert(e.index);
@@ -406,20 +555,25 @@ export default {
           // this.getPaths();
           break;
         case "3":
-          this.getTable();
+          // this.getTable();
           break;
       }
     },
-    getTable() {
-      this.tableLoading = true;
-      getTableData(this.listQuery)
+    getChartData() {
+      this.loading = true;
+      getAllData(this.listQuery)
         .then(res => {
-          console.log(res);
-          this.tableData = res;
-          this.tableLoading = false;
+          // console.log(res);
+          this.allData = res;
+          this.mapData.rows = res.list1;
+          this.pieData.rows = res.list2;
+          this.pieData2.rows = res.list3;
+          // console.log(res.list2);
+          this.initChart();
+          this.loading = false;
         })
         .catch(res => {
-          this.tableLoading = false;
+          this.loading = false;
         });
     },
     // 格式化表格
@@ -433,30 +587,6 @@ export default {
     },
     headerStyle({ row, column, rowIndex, columnIndex }) {
       return "table-header";
-    },
-    // getdate() {
-    //   const end = new Date();
-    //   // const start = new Date();
-    //   const start = end.getFullYear() + "-0" + end.getMonth() + "-01"; // 拼接为当月第一天
-    //   // alert(start);
-    // },
-    // 查询日期初始化，近三个月
-    getDate() {
-      const end = new Date();
-      const start = new Date();
-      // 近三个月
-      start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-      this.listQuery.start_date = start
-        .toLocaleDateString()
-        .replace(/\//g, "-"); // 转换为"2020-03-13"格式
-      this.listQuery.end_date = end.toLocaleDateString().replace(/\//g, "-");
-    },
-    // 条件过滤
-    handleFilter(data) {
-      // console.log(data);
-      this.listQuery = data;
-      this.getDayChart();
-      this.getTable();
     },
 
     getDayChart() {
