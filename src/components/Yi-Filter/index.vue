@@ -13,15 +13,17 @@
       end-placeholder="结束日期"
       size="mini"
       align="right"
-      @change="handleFilter"
+      @change="handleQuery"
     />
     <el-select
       v-model="listQuery.city"
       placeholder="县市"
+      :clearable="true"
       style="width: 90px"
       size="mini"
       class="filter-item"
       @change="handleFilter"
+      @clear="clearFilter"
     >
       <el-option v-for="item in citys" :key="item" :label="item" :value="item" />
     </el-select>
@@ -107,14 +109,24 @@ export default {
   },
   created() {},
   methods: {
-    // 条件过滤
-    handleFilter() {
+    // 查询数据库
+    handleQuery() {
       if (this.select_date) {
         this.listQuery.start_date = this.select_date[0];
         this.listQuery.end_date = this.select_date[1];
       }
       // 查询参数传递至父组件
-      this.$emit("filter", this.listQuery);
+      this.$emit("query", this.listQuery);
+    },
+    // 条件过滤
+    handleFilter() {
+      var city = this.listQuery.city;
+      // 查询参数传递至父组件
+      this.$emit("filter", city);
+    },
+    // 清除过滤
+    clearFilter() {
+      this.$emit("filter", "衢州");
     }
   }
 };
