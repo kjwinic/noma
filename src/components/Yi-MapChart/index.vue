@@ -11,6 +11,7 @@
     :legend-visible="false"
     :height="height"
     :width="width"
+    :events="mapEvents"
   ></ve-map>
 </template>
 
@@ -44,6 +45,18 @@ export default {
         return [{}];
       }
     },
+    extend: {
+      type: Object,
+      default() {
+        return [{}];
+      }
+    },
+    visualMap: {
+      type: Object,
+      default() {
+        return [{}];
+      }
+    },
     height: {
       type: String,
       default: "800px"
@@ -63,7 +76,8 @@ export default {
         // edit data here such as:
         // json.features[0].properties.cp = [121.509062, 26.044332]
         return json;
-      }
+      },
+      selectedMode: "single"
     };
     // 标题
     this.title = {
@@ -109,6 +123,14 @@ export default {
         }
       }
     };
+    var that = this;
+    this.mapEvents = {
+      click: function(e) {
+        var city = e.data.name;
+        console.log(city);
+        that.$emit("filter", city);
+      }
+    };
     return {};
   },
   created() {
@@ -128,6 +150,9 @@ export default {
       max = Math.ceil(max / 10) * 10; // 向上取整
       // console.log(max);
       this.visualMap.max = max; // 设置图例最大值
+    },
+    clickMap(e) {
+      console.log(e);
     }
   }
 };
