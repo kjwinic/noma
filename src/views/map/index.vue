@@ -211,9 +211,10 @@
         <!-- <bm-marker :position="{lng: lng, lat: lat}" :dragging="true" icon="../../static/image/coord-point.png">
         </bm-marker>-->
         <bm-marker :position="{lng: coord.lng, lat: coord.lat}" :dragging="true" :icon="coord.icon">
+          <!-- 获取坐标信息label -->
           <bm-label
             :content="coord.label"
-            :label-style="{color: 'gray', fontSize : '12px', padding: '5px', borderRadius: '5px', border: '2px solid #f4516c'}"
+            :label-style="{color: '#fff', fontSize : '12px', padding: '5px', borderRadius: '5px', background: 'rgba(0,0,0,0.8)' ,boxShadow:'0 0 5px #000',borderColor:'transparent'}"
             :offset="{width: -90, height: -50}"
           />
         </bm-marker>
@@ -317,7 +318,7 @@ export default {
       center: "衢州市",
       ak: "U43Xy5aiHHDKWZwQOxPn7NS8kGdv8kFO",
       mapType: "BMAP_NORMAL_MAP",
-      zoom: 10,
+      zoom: 11,
       scale: 16, // 该层级显示卫星图层
       map: {
         width: "100%",
