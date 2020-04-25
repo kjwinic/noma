@@ -90,19 +90,83 @@
               <el-col :span="12">
                 <el-card class="box-card">
                   <div slot="header" class="clearfix">
-                    <span>重复用户</span>
+                    <span>重复用户{{timeInterval}}</span>
                     <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
                   </div>
-                  <div v-for="o in 4" :key="o" class="text item">{{ '列表内容 ' + o }}</div>
+                  <el-table
+                    v-loading="hotLoading"
+                    align="center"
+                    :data="hotData.list1"
+                    style="width:100%;height:550px;font-size:12px"
+                    element-loading-text="加载中"
+                    max-height="600"
+                  >
+                    <el-table-column prop="user_tel" label="用户号码" align="center" width="100px" />
+                    <el-table-column prop="count" label="投诉次数" align="center" width="80px" />
+                    <el-table-column prop="city" label="县市" align="center" width="60px" />
+                    <el-table-column
+                      prop="area"
+                      label="投诉地点"
+                      align="center"
+                      width="100px"
+                      :show-overflow-tooltip="true"
+                    />
+                    <el-table-column
+                      prop="cp_type"
+                      label="最近投诉原因"
+                      align="center"
+                      width="100px"
+                      :show-overflow-tooltip="true"
+                    />
+                    <el-table-column
+                      prop="solve_plan"
+                      label="解决方案"
+                      width="100px"
+                      :show-overflow-tooltip="true"
+                    />
+                    <el-table-column prop="cp_date" label="最近投诉时间" align="center" width="100px" />
+                    <el-table-column
+                      prop="is_solved"
+                      label="是否解决"
+                      align="center"
+                      width="80px"
+                      :filters="[{ text: '是', value: '是' }, { text: '否', value: '否' }]"
+                      :filter-method="filterTag"
+                      filter-placement="bottom-end"
+                    >
+                      <template slot-scope="scope">
+                        <el-tag
+                          :type="scope.row.is_solved === '否' ? 'danger' : 'success'"
+                          disable-transitions
+                        >{{scope.row.is_solved}}</el-tag>
+                      </template>
+                    </el-table-column>
+                  </el-table>
                 </el-card>
               </el-col>
               <el-col :span="12">
                 <el-card class="box-card">
                   <div slot="header" class="clearfix">
-                    <span>热点区域</span>
+                    <span>热点区域{{timeInterval}}</span>
                     <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
                   </div>
-                  <div v-for="o in 4" :key="o" class="text item">{{ '列表内容 ' + o }}</div>
+                  <el-table
+                    v-loading="hotLoading"
+                    align="center"
+                    :data="hotData.list2"
+                    style="width:100%;height:550px;font-size:12px"
+                    element-loading-text="加载中"
+                    max-height="600"
+                  >
+                    <el-table-column prop="city" label="县市" align="center" />
+                    <el-table-column prop="area" label="投诉区域" :show-overflow-tooltip="true" />
+                    <el-table-column prop="count" label="投诉次数" align="center" />
+                    <el-table-column prop="user_count" label="关联用户数" align="center" />
+                    <el-table-column prop="cp_type" label="投诉原因" :show-overflow-tooltip="true" />
+                    <el-table-column prop="solve_plan" label="解决方案" :show-overflow-tooltip="true" />
+                    <el-table-column prop="cp_date" label="最近投诉时间" align="center" width="100px" />
+                    <el-table-column prop="is_solved" label="是否解决" align="center" />
+                  </el-table>
                 </el-card>
               </el-col>
             </el-row>
@@ -122,31 +186,31 @@
                     style="width:100%;height:450px;font-size:12px"
                   >
                     <el-table-column prop="city" label="县市" width="50px" />
-                    <el-table-column prop="total" label="投诉数量" align="center" width="50px" />
+                    <el-table-column prop="total" label="投诉数量" align="center" width="70px" />
                     <el-table-column
                       prop="zhanbi"
                       label="投诉量占比"
                       :formatter="stateFormat"
                       align="center"
-                      width="70px"
+                      width="80px"
                     />
-                    <el-table-column prop="citynum" label="城区投诉数量" align="center" width="70px" />
+                    <el-table-column prop="citynum" label="城区投诉量" align="center" width="80px" />
                     <el-table-column
                       prop="cityzhanbi"
                       label="城区投诉占比"
                       :formatter="stateFormat"
                       align="center"
-                      width="70px"
+                      width="100px"
                     />
-                    <el-table-column prop="countrynum" label="农村投诉数量" align="center" width="70px" />
+                    <el-table-column prop="countrynum" label="农村投诉量" align="center" width="80px" />
                     <el-table-column
                       prop="countryzhanbi"
                       label="农村投诉占比"
                       :formatter="stateFormat"
                       align="center"
-                      width="70px"
+                      width="100px"
                     />
-                    <el-table-column prop="jiejuenum" label="已解决数量" align="center" width="70px" />
+                    <el-table-column prop="jiejuenum" label="已解决数量" align="center" width="80px" />
                     <el-table-column
                       prop="jiejuelv"
                       label="解决率"
@@ -235,7 +299,7 @@ import "echarts/lib/component/title"; // 标题
 import "echarts/lib/component/dataZoom"; // 设置区域缩放组件
 import "echarts/lib/component/toolbox"; // 工具箱
 import "v-charts/lib/style.css"; // 使用loading属性前先引入css
-import { getDayData, getAllData } from "@/api/complain-chart.js";
+import { getDayData, getAllData, getHotData } from "@/api/complain-chart.js";
 import { formatDate } from "@/utils/getDate.js";
 
 export default {
@@ -415,7 +479,9 @@ export default {
       chartData: {}, // 图表数据
       loading: false,
       allData: {},
-      tableLoading: false
+      tableLoading: false,
+      hotData: {}, // 热点投诉
+      hotLoading: false
     };
   },
   created() {
@@ -428,6 +494,10 @@ export default {
     // this.getdate();
   },
   methods: {
+    // 表格筛选  
+    filterTag(value, row) {
+        return row.is_solved === value;
+      },
     getDate() {
       const end = new Date();
       // const start = new Date();
@@ -552,18 +622,30 @@ export default {
           this.getDayChart();
           break;
         case "2":
-          // this.getPaths();
+          this.getHotComplain();
           break;
         case "3":
           // this.getTable();
           break;
       }
     },
+    getHotComplain() {
+      this.hotLoading = true;
+      getHotData(this.listQuery)
+        .then(res => {
+          console.log(res);
+          this.hotData = res;
+          this.hotLoading = false;
+        })
+        .catch(res => {
+          this.hotLoading = false;
+        });
+    },
     getChartData() {
       this.loading = true;
       getAllData(this.listQuery)
         .then(res => {
-          // console.log(res);
+          console.log(res);
           this.allData = res;
           this.mapData.rows = res.list1;
           this.pieData.rows = res.list2;
