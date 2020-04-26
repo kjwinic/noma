@@ -300,6 +300,7 @@
   </div>
 </template>
 <script>
+
 import "@/styles/base.css";
 import "@/styles/infowindow.css";
 import DistanceTool from "bmaplib.new-distancetool";
@@ -655,7 +656,7 @@ export default {
         this.coord.lat +
         "<br />地  址：" +
         this.address;
-      this.value = "当前经纬度：" + this.coord.lng + ";" + this.coord.lat; // 经纬度赋值到搜索框，用于粘贴
+      this.keyword = "当前经纬度：" + this.coord.lng + ";" + this.coord.lat; // 经纬度赋值到搜索框，用于粘贴
     },
     // 获取投诉数据
     getCompalins() {

@@ -1,6 +1,6 @@
 
 <template>
-  <div class="app-container">
+  <div class="app-container" style="overflow:auto">
     <el-container>
       <el-main>
         <div class="filter">
@@ -90,7 +90,7 @@
               <el-col :span="12">
                 <el-card class="box-card">
                   <div slot="header" class="clearfix">
-                    <span>重复用户{{timeInterval}}</span>
+                    <span>重复用户{{ timeInterval }}</span>
                     <el-button style="float: right; padding: 3px 0" type="text">下载表格</el-button>
                   </div>
                   <el-table
@@ -138,7 +138,7 @@
                         <el-tag
                           :type="scope.row.is_solved === '否' ? 'danger' : 'success'"
                           disable-transitions
-                        >{{scope.row.is_solved}}</el-tag>
+                        >{{ scope.row.is_solved }}</el-tag>
                       </template>
                     </el-table-column>
                   </el-table>
@@ -147,7 +147,7 @@
               <el-col :span="12">
                 <el-card class="box-card">
                   <div slot="header" class="clearfix">
-                    <span>热点区域{{timeInterval}}</span>
+                    <span>热点区域{{ timeInterval }}</span>
                     <el-button style="float: right; padding: 3px 0" type="text">下载表格</el-button>
                   </div>
                   <el-table
@@ -165,7 +165,22 @@
                     <el-table-column prop="cp_type" label="投诉原因" :show-overflow-tooltip="true" />
                     <el-table-column prop="solve_plan" label="解决方案" :show-overflow-tooltip="true" />
                     <el-table-column prop="cp_date" label="最近投诉时间" align="center" width="100px" />
-                    <el-table-column prop="is_solved" label="是否解决" align="center" />
+                    <el-table-column
+                      prop="is_solved"
+                      label="是否解决"
+                      align="center"
+                      width="80px"
+                      :filters="[{ text: '是', value: '是' }, { text: '否', value: '否' }]"
+                      :filter-method="filterTag"
+                      filter-placement="bottom-end"
+                    >
+                      <template slot-scope="scope">
+                        <el-tag
+                          :type="scope.row.is_solved === '否' ? 'danger' : 'success'"
+                          disable-transitions
+                        >{{ scope.row.is_solved }}</el-tag>
+                      </template>
+                    </el-table-column>
                   </el-table>
                 </el-card>
               </el-col>
@@ -494,10 +509,10 @@ export default {
     // this.getdate();
   },
   methods: {
-    // 表格筛选  
+    // 表格筛选
     filterTag(value, row) {
-        return row.is_solved === value;
-      },
+      return row.is_solved === value;
+    },
     getDate() {
       const end = new Date();
       // const start = new Date();
