@@ -97,7 +97,7 @@
           >
             <el-button
               slot="trigger"
-              :loading="downloadLoading"
+              :loading="upLoading"
               class="filter-item"
               type="primary"
               size="mini"
@@ -622,7 +622,9 @@ export default {
       change_flag: false, // 是否修改标记
       getcoord_flag: false, // 是否打开坐标拾取标价
       complain_points: [],
-      loading: false
+      loading: false,
+      downloadLoading: false,
+      upLoading: false
     };
   },
   created() {

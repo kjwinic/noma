@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <baidu-map class="bm-view" :center="center" :zoom="zoom" :mapStyle="mapStyle" @ready="handlers"></baidu-map>
+    <baidu-map class="bm-view" :center="center" :zoom="zoom" :map-style="mapStyle" @ready="handler"></baidu-map>
   </div>
 </template>
 
@@ -9,23 +9,23 @@
 // import mapStyle from './static/mapStyle.json'
 // import mapv from '@/utils/mapv.min.js'
 // import { baiduMapLayer, DataSet, utilCityCenter } from 'mapv'
-import * as mapv from 'mapv'
+// import * as mapv from 'mapv'
 
 export default {
-  // name: "Mapv",
+  name: "Mapv",
   data() {
     return {
       center: { lng: 0, lat: 0 },
-      zoom: 3,
-      mapStyle: { style: "light" }
+      zoom: 10,
+      mapStyle: { style: "dark" }
     };
   },
   watch: {},
   mounted() {
-    // console.log(DataSet);
+    // console.log(mapv.OpenlayersLayer, mapv.DataSet, mapv.utilCityCenter)
   },
   methods: {
-    handlers({ BMap, map }) {
+    handler({ BMap, map }) {
       var mapv = require("mapv");
       map.enableScrollWheelZoom(true); // 开启鼠标滚轮缩放
       console.log(BMap, map);
@@ -98,9 +98,12 @@ export default {
         size: 5,
         draw: "simple"
       };
-      console.log(options);
+      console.log("hello");
+      // eslint-disable-next-line new-cap
       var mapvLayer = new mapv.baiduMapLayer(map, dataSet, options);
-      // mapvLayer.show(); // 显示图层
+      console.log("hello2");
+
+      mapvLayer.show(); // 显示图层
     }
   }
 };
@@ -109,7 +112,7 @@ export default {
 <style lang="scss" scoped>
 .content {
   height: 100%;
-  width: 60%;
+  width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;

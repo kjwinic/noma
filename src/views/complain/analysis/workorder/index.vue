@@ -91,7 +91,7 @@
                 <el-card class="box-card">
                   <div slot="header" class="clearfix">
                     <span>重复用户{{ timeInterval }}</span>
-                    <el-button style="float: right; padding: 3px 0" type="text">下载表格</el-button>
+                    <el-button style="width:60px;float: right; padding: 3px 0" type="text">下载表格</el-button>
                   </div>
                   <el-table
                     v-loading="hotLoading"
@@ -148,7 +148,7 @@
                 <el-card class="box-card">
                   <div slot="header" class="clearfix">
                     <span>热点区域{{ timeInterval }}</span>
-                    <el-button style="float: right; padding: 3px 0" type="text">下载表格</el-button>
+                    <el-button style="width:60px;float: right; padding: 3px 0" type="text">下载表格</el-button>
                   </div>
                   <el-table
                     v-loading="hotLoading"

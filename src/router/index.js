@@ -66,19 +66,17 @@ export const constantRoutes = [
       meta: { title: '地图呈现', icon: 'map', affix: true }
     }]
   },
-
-  // {
-  //   path: '/plan',
-  //   component: Layout,
-  //   redirect: '/plan',
-  //   children: [{
-  //     path: 'plan',
-  //     name: 'Plan',
-  //     component: () => import('@/views/plan/index'),
-  //     meta: { title: '方案跟踪', icon: 'eye-open' }
-  //   }]
-  // },
-
+  {
+    path: '/5g',
+    component: Layout,
+    redirect: '/5g',
+    children: [{
+      path: '5g',
+      name: '5g',
+      component: () => import('@/views/5g/index'),
+      meta: { title: '5G网络覆盖', icon: 'eye-open' }
+    }]
+  },
   {
     path: '/complain',
     component: Layout,
