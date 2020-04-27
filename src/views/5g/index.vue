@@ -175,7 +175,7 @@ export default {
                 console.log(this.infoWindow);
               }
             },
-            maxZoom: 17, // 最大显示级别
+            maxZoom: 20, // 最大显示级别，超过不显示点聚合
             minZoom: 8, // 最小显示级别
             label: {
               // 聚合文本样式
