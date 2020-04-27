@@ -56,7 +56,7 @@ export const constantRoutes = [
   },
 
   {
-    path: '/map',
+    path: '/',
     component: Layout,
     redirect: '/map',
     children: [{
@@ -67,12 +67,12 @@ export const constantRoutes = [
     }]
   },
   {
-    path: '/5g',
+    path: '/',
     component: Layout,
     redirect: '/5g',
     children: [{
-      path: '5g',
-      name: '5g',
+      path: 'FiveG',
+      name: 'FiveG',
       component: () => import('@/views/5g/index'),
       meta: { title: '5G网络覆盖', icon: 'eye-open' }
     }]

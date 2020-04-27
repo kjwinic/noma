@@ -7,7 +7,7 @@
         :zoom="zoom"
         :scroll-wheel-zoom="true"
         :map-type="mapType"
-        @ready="setDistanceToolInstance"
+        @ready="getCompalins"
         @moveend="getMapCenter"
         @zoomend="getZoom"
         @rightclick="getCoord"
@@ -126,7 +126,7 @@
         <!-- <bml-marker-clusterer :averageCenter="true">
         <bm-marker v-for="marker of markers" :position="{lng: marker.lng, lat: marker.lat}"></bm-marker>
         </bml-marker-clusterer>-->
-        <!--信息窗体-->
+        <!--弹窗信息窗体-->
         <bm-info-window
           :position="infoWindow.position"
           :title="infoWindow.title"
@@ -659,14 +659,102 @@ export default {
       this.keyword = "当前经纬度：" + this.coord.lng + ";" + this.coord.lat; // 经纬度赋值到搜索框，用于粘贴
     },
     // 获取投诉数据
-    getCompalins() {
-      console.log(this.listQuery);
-      // this.complain_flag = !this.complain_flag;
+    // getCompalins() {
+    //   console.log(this.listQuery);
+    //   // this.complain_flag = !this.complain_flag;
+    //   this.loading = true;
+    //   getComplain(this.listQuery)
+    //     .then(response => {
+    //       console.log(response.data);
+    //       this.complain_points = response.data;
+    //       this.loading = false;
+    //     })
+    //     .catch(response => {
+    //       this.loading = false;
+    //     });
+    // },
+
+    getCompalins({ BMap, map }) {
+      var mapv = require("mapv");
       this.loading = true;
       getComplain(this.listQuery)
         .then(response => {
-          console.log(response.data);
-          this.complain_points = response.data;
+          // console.log(response.data);
+          var d = response.data;
+          var len = d.length;
+          var data = [];
+          var point = [];
+          // 构造数据
+          for (var i = 0; i < len; i++) {
+            point = wgs84tobd09(
+              d[i].lng,
+              d[i].lat
+            ); // wgs84坐标系转换为bd09l
+            data.push({
+              geometry: {
+                type: "Point",
+                coordinates: [point[0], point[1]]
+              },
+              lng: point[0],
+              lat: point[1],
+              city: d[i].city,
+              town: d[i].town,
+              area: d[i].area,
+              cp_time: d[i].cp_time,
+              cp_info: d[i].cp_info,
+              deal_info: d[i].deal_info,
+              solve_plan: d[i].solve_plan
+            });
+          }
+          this.complain_points = data;
+          var dataSet = new mapv.DataSet(data);
+          var options = {
+            // shadowColor: 'rgba(255, 250, 50, 1)',
+            // shadowBlur: 10,
+            fillStyle: "rgba(255, 50, 0, 1.0)", // 非聚合点的颜色
+            size: 2, // 非聚合点的半径
+            minSize: 8, // 聚合点最小半径
+            maxSize: 31, // 聚合点最大半径
+            globalAlpha: 0.8, // 透明度
+            clusterRadius: 150, // 聚合像素半径
+            methods: {
+              click: function(data) {
+                console.log(data); // 点击事件
+                // alert(data.geometry.coordinates[1]); // 点击事件
+                this.infoWindow = {
+                  position: {
+                    lng: data.geometry.coordinates[0],
+                    lat: data.geometry.coordinates[1]
+                  },
+                  title: "hello",
+                  show: true,
+                  content: {
+                    info1: "投诉时间：",
+                    info2: "投诉内容：",
+                    info3: "处理过程：",
+                    info4: "解决方案："
+                  }
+                };
+                console.log(this.infoWindow);
+              }
+            },
+            maxZoom: 18, // 最大显示级别
+            minZoom: 8, // 最小显示级别
+            label: {
+              // 聚合文本样式
+              show: true, // 是否显示
+              fillStyle: "white"
+              // shadowColor: 'yellow',
+              // font: '20px Arial',
+              // shadowBlur: 10,
+            },
+            gradient: { 0: "blue", 0.5: "yellow", 1.0: "rgb(255,0,0)" }, // 聚合图标渐变色
+            draw: "cluster"
+          };
+
+          // eslint-disable-next-line new-cap
+          var mapvLayer = new mapv.baiduMapLayer(map, dataSet, options);
+          console.log(mapvLayer);
           this.loading = false;
         })
         .catch(response => {

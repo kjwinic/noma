@@ -1,29 +1,71 @@
 <template>
-  <div class="content">
-    <baidu-map
-      class="bm-view"
-      :center="center"
-      :zoom="zoom"
-      :scroll-wheel-zoom="true"
-      :map-style="mapStyle"
-      @ready="handler"
-    ></baidu-map>
-  </div>
+  <el-row>
+    <el-col
+      v-loading="loading"
+      element-loading-text="地图数据加载中"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
+      :span="24"
+    >
+      <div class="content">
+        <baidu-map
+          class="bm-view"
+          :center="center"
+          :zoom="zoom"
+          :scroll-wheel-zoom="true"
+          :map-type="mapType"
+          @ready="handler"
+        >
+          <!--弹窗信息窗体-->
+          <bm-info-window
+            :position="infoWindow.position"
+            :title="infoWindow.title"
+            :show="infoWindow.show"
+            @close="infoWindowClose"
+            @open="infoWindowOpen"
+          >
+            <p>
+              <span class="left"></span>
+              <span class="right">{{ infoWindow.content.info1 }}</span>
+            </p>
+            <p>
+              <span class="left"></span>
+              <span class="right">{{ infoWindow.content.info2 }}</span>
+            </p>
+            <p>
+              <span class="left"></span>
+              <span class="right">{{ infoWindow.content.info3 }}</span>
+            </p>
+            <p>
+              <span class="left"></span>
+              <span class="right">{{ infoWindow.content.info4 }}</span>
+            </p>
+            <p>
+              <a class="edit-complain" href>更新信息</a>
+            </p>
+          </bm-info-window>
+        </baidu-map>
+      </div>
+    </el-col>
+  </el-row>
 </template>
 
 <script>
 // import BaiduMap from "vue-baidu-map/components/map/Map.vue";
 // import mapStyle from './static/mapStyle.json'
 // import * as mapv from 'mapv'
+import "@/styles/base.css";
+import "@/styles/infowindow.css";
 import { getComplain } from "@/api/complain.js";
+import { wgs84tobd09 } from "@/utils/transformCoordinate.js";
 
 export default {
-  name: "Mapv",
+  name: "FiveG",
   data() {
     return {
       center: "衢州",
       zoom: 10,
-      mapStyle: { style: "normal" },
+      mapType: "BMAP_HYBRID_MAP",
+      // mapStyle: { style: "normal" },
       complain_points: [],
       listQuery: {
         // 投诉库查询参数
@@ -36,7 +78,22 @@ export default {
         start_date: "",
         end_date: "",
         area: ""
-      }
+      },
+      infoWindow: {
+        position: {
+          lng: 0,
+          lat: 0
+        },
+        title: "",
+        show: false,
+        content: {
+          info1: "",
+          info2: "",
+          info3: "",
+          info4: ""
+        }
+      },
+      loading: false
     };
   },
   watch: {},
@@ -57,27 +114,34 @@ export default {
       var today = now.getFullYear() + "-" + month + "-" + day;
       this.listQuery.end_date = today;
     },
+    infoWindowOpen(e) {
+      this.infoWindow.show = true;
+    },
+    infoWindowClose(e) {
+      this.infoWindow.show = false;
+    },
     handler({ BMap, map }) {
       var mapv = require("mapv");
+      this.loading = true;
       getComplain(this.listQuery)
         .then(response => {
-        //   console.log(response.data);
+          //   console.log(response.data);
           this.complain_points = response.data;
-          var randomCount = this.complain_points.length;
+          var count = this.complain_points.length;
           var data = [];
+          var point = [];
           // 构造数据
-          for (var i = 0; i < randomCount; i++) {
-            // var cityCenter = mapv.utilCityCenter.getCenterByCityName(
-            //   citys[parseInt(Math.random() * citys.length)]
-            // );
+          for (var i = 0; i < count; i++) {
+            point = wgs84tobd09(
+              this.complain_points[i].lng,
+              this.complain_points[i].lat
+            ); // wgs84坐标系转换为bd09l
             data.push({
               geometry: {
                 type: "Point",
-                coordinates: [
-                  this.complain_points[i].lng,
-                  this.complain_points[i].lat
-                ]
-              }
+                coordinates: [point[0], point[1]]
+              },
+              cp_name: this.complain_points[i].user_tel
             });
           }
           var dataSet = new mapv.DataSet(data);
@@ -91,11 +155,28 @@ export default {
             globalAlpha: 0.8, // 透明度
             clusterRadius: 150, // 聚合像素半径
             methods: {
-              click: function(item) {
-                console.log(item); // 点击事件
+              click: function(data) {
+                console.log(data); // 点击事件
+                // alert(data.geometry.coordinates[1]); // 点击事件
+                this.infoWindow = {
+                  position: {
+                    lng: data.geometry.coordinates[0],
+                    lat: data.geometry.coordinates[1]
+                  },
+                  title: "hello",
+                  show: true,
+                  content: {
+                    info1: "投诉时间：",
+                    info2: "投诉内容：",
+                    info3: "处理过程：",
+                    info4: "解决方案："
+                  }
+                };
+                console.log(this.infoWindow);
               }
             },
-            maxZoom: 19, // 最大显示级别
+            maxZoom: 17, // 最大显示级别
+            minZoom: 8, // 最小显示级别
             label: {
               // 聚合文本样式
               show: true, // 是否显示
@@ -111,10 +192,10 @@ export default {
           // eslint-disable-next-line new-cap
           var mapvLayer = new mapv.baiduMapLayer(map, dataSet, options);
           console.log(mapvLayer);
-        // this.loading = false;
+          this.loading = false;
         })
         .catch(response => {
-        // this.loading = false;
+          this.loading = false;
         });
     },
     // 获取投诉数据
@@ -126,12 +207,13 @@ export default {
           console.log(response.data);
           this.complain_points = response.data;
           this.handler();
-        // this.loading = false;
+          // this.loading = false;
         })
         .catch(response => {
-        // this.loading = false;
+          // this.loading = false;
         });
     }
+    // 经纬度转换
   }
 };
 </script>
