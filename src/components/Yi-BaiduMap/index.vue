@@ -56,6 +56,7 @@
         :keyword="keyword"
         :auto-viewport="true"
         :select-first-result="true"
+        :panel="false"
         @searchcomplete="poiResult"
       ></bm-local-search>
 
@@ -228,6 +229,9 @@ export default {
     },
     // poi搜索结果
     poiResult(res) {
+      if (!res) {
+        return
+      }
       var data = res.Ir;
       var len = data.length;
       for (var i = 0; i < len; i++) {
