@@ -13,20 +13,20 @@
       @ready="setDistanceToolInstance"
     >
       <!-- 切换地图类型 -->
-      <bm-map-type
+      <!-- <bm-map-type
         :map-types="['BMAP_NORMAL_MAP', 'BMAP_HYBRID_MAP']"
         anchor="BMAP_ANCHOR_TOP_LEFT"
-      ></bm-map-type>
+      ></bm-map-type> -->
       <!-- 获取当前位置 -->
       <bm-geolocation
         anchor="BMAP_ANCHOR_BOTTOM_LEFT"
         :show-address-bar="true"
         :auto-location="true"
       ></bm-geolocation>
-      <!-- 定位控件 -->
-      <bm-panorama anchor="BMAP_ANCHOR_BOTTOM_RIGHT" offset="{width:20,height:50" }></bm-panorama>
       <!-- 全景控件 -->
-      <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
+      <bm-panorama anchor="BMAP_ANCHOR_BOTTOM_RIGHT" offset="{width:20,height:50" }></bm-panorama>
+      <!-- 缩放控件 -->
+      <!-- <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation> -->
       <!-- 测距控件 -->
       <bm-control anchor="BMAP_ANCHOR_TOP_LEFT" :offset="{width:100,height:10}">
         <el-button size="mini" type="primary" @click="openDistanceTool">开启测距</el-button>
