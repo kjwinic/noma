@@ -91,7 +91,7 @@
                 <el-card class="box-card">
                   <div slot="header" class="clearfix">
                     <span>重复用户{{ timeInterval }}</span>
-                    <el-button style="width:60px;float: right; padding: 3px 0" type="text">下载表格</el-button>
+                    <el-button style="width:60px;float: right; padding: 3px 0" type="text" @click="handleDownload_repeat">下载表格</el-button>
                   </div>
                   <el-table
                     v-loading="hotLoading"
@@ -193,7 +193,7 @@
                 <el-card class="box-card">
                   <div slot="header" class="clearfix">
                     <span>分县市投诉量{{ timeInterval }}</span>
-                    <el-button style="float: right; padding: 3px 0" type="text">下载表格</el-button>
+                    <el-button style="float: right; padding: 3px 0" type="text" @click="handleDownload">下载表格</el-button>
                   </div>
                   <el-table
                     :data="allData.list1"
@@ -316,6 +316,7 @@ import "echarts/lib/component/toolbox"; // 工具箱
 import "v-charts/lib/style.css"; // 使用loading属性前先引入css
 import { getDayData, getAllData, getHotData } from "@/api/complain-chart.js";
 import { formatDate } from "@/utils/getDate.js";
+import { parseTime } from "@/utils";
 
 export default {
   name: "ComplainWorkorder",
@@ -496,7 +497,8 @@ export default {
       allData: {},
       tableLoading: false,
       hotData: {}, // 热点投诉
-      hotLoading: false
+      hotLoading: false,
+      downloadLoading: false
     };
   },
   created() {
@@ -696,6 +698,91 @@ export default {
         .catch(res => {
           this.loading = false;
         });
+    },
+
+    // 批量导出
+    handleDownload() {
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then(excel => {
+        const tHeader = [
+          "县市",
+          "投诉数量",
+          "投诉量占比",
+          "城区投诉量",
+          "城区投诉占比",
+          "农村投诉量",
+          "农村投诉占比",
+          "已解决数量",
+          "解决率"
+        ];
+        const filterVal = [
+          "city",
+          "total",
+          "zhanbi",
+          "citynum",
+          "cityzhanbi",
+          "countrynum",
+          "countryzhanbi",
+          "jiejuenum",
+          "jiejuelv"
+        ];
+        const list = this.allData.list1;
+        const data = this.formatJson(filterVal, list);
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "无线分县市投诉量" + this.timeInterval,
+          autoWidth: this.autoWidth,
+          bookType: this.bookType
+        });
+        this.downloadLoading = false;
+      });
+    },
+    handleDownload_repeat() {
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then(excel => {
+        const tHeader = [
+          "用户号码",
+          "投诉次数",
+          "县市",
+          "投诉地点",
+          "最近投诉原因",
+          "解决方案",
+          "最近投诉时间",
+          "是否解决"
+        ];
+        const filterVal = [
+          "user_tel",
+          "count",
+          "city",
+          "area",
+          "cp_type",
+          "solve_plan",
+          "cp_date",
+          "is_solved"
+        ];
+        const list = this.hotData.list1;
+        const data = this.formatJson(filterVal, list);
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "重复用户清单" + this.timeInterval,
+          autoWidth: this.autoWidth,
+          bookType: this.bookType
+        });
+        this.downloadLoading = false;
+      });
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v =>
+        filterVal.map(j => {
+          if (j === "timestamp") {
+            return parseTime(v[j]);
+          } else {
+            return v[j];
+          }
+        })
+      );
     }
   }
 };
