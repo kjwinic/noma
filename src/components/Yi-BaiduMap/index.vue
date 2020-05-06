@@ -26,7 +26,7 @@
       <!-- 全景控件 -->
       <bm-panorama anchor="BMAP_ANCHOR_BOTTOM_RIGHT" offset="{width:20,height:50" }></bm-panorama>
       <!-- 缩放控件 -->
-      <!-- <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation> -->
+      <bm-navigation anchor="BMAP_ANCHOR_TOP_LEFT"></bm-navigation>
       <!-- 测距控件 -->
       <bm-control anchor="BMAP_ANCHOR_TOP_LEFT" :offset="{width:100,height:10}">
         <el-button size="mini" type="primary" @click="openDistanceTool">开启测距</el-button>
