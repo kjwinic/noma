@@ -16,16 +16,16 @@
           :map-types="['BMAP_NORMAL_MAP', 'BMAP_HYBRID_MAP']"
           anchor="BMAP_ANCHOR_TOP_LEFT"
         ></bm-map-type>
+        <!-- 定位控件 -->
         <bm-geolocation
           anchor="BMAP_ANCHOR_BOTTOM_LEFT"
           :show-address-bar="true"
           :auto-location="true"
         ></bm-geolocation>
-        <!-- 定位控件 -->
-        <bm-panorama anchor="BMAP_ANCHOR_BOTTOM_RIGHT" offset="{width:20,height:50" }></bm-panorama>
         <!-- 全景控件 -->
-        <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
+        <bm-panorama anchor="BMAP_ANCHOR_BOTTOM_RIGHT" offset="{width:20,height:50" }></bm-panorama>
         <!-- 缩放控件 -->
+        <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
         <!-- 测距控件 -->
         <bm-control anchor="BMAP_ANCHOR_TOP_LEFT" :offset="{width:100,height:10}">
           <el-button size="mini" type="primary" @click="openDistanceTool">开启测距</el-button>
@@ -95,6 +95,7 @@
             size="mini"
             :clearable="true"
             @select="handleSelect"
+            @focus="startSearch"
           >
             <i class="el-icon-edit el-input__icon" @click="handleIconClick"></i>
             <template slot-scope="{ item }">
@@ -151,7 +152,7 @@
             <span class="right">{{ infoWindow.content.info4 }}</span>
           </p>
           <p>
-            <a class="edit-complain" href>更新信息</a>
+            <a class="edit-complain" @click="handleUpdate">更新信息</a>
           </p>
         </bm-info-window>
         <!-- 加载基站点 -->
@@ -161,6 +162,7 @@
           :position="{lng: marker.lng, lat: marker.lat}"
           :icon="marker.icon"
           :title="marker.title"
+          :z-index="0"
           @click="clickSitesHandler"
         >
           <!-- 右键菜单 -->
@@ -227,8 +229,19 @@
           ></el-button>
         </bm-control>
       </baidu-map>
-    </div>
 
+    </div>
+    <!-- 编辑信息弹窗 -->
+    <el-dialog
+      :visible.sync="dialogFormVisible"
+      center
+      width="50%"
+      top="5vh"
+      :before-close="closeUpdate"
+      class="my"
+    >
+      <YiEditDialog :editdata="cp_edit_data"></YiEditDialog>
+    </el-dialog>
     <!-- 搜索结果 -->
     <el-drawer
       :visible.sync="show_results"
@@ -308,9 +321,11 @@ import DistanceTool from "bmaplib.new-distancetool";
 import { getComplain } from "@/api/complain.js";
 import { getSite } from "@/api/site.js";
 import { wgs84tobd09, bd09towgs84 } from "@/utils/transformCoordinate.js";
+import YiEditDialog from "@/components/Yi-Edit-Dialog";
 
 export default {
   name: "Map",
+  components: { YiEditDialog },
   data() {
     return {
       distanceTool: "",
@@ -319,7 +334,7 @@ export default {
       center: "衢州市",
       ak: "U43Xy5aiHHDKWZwQOxPn7NS8kGdv8kFO",
       mapType: "BMAP_NORMAL_MAP",
-      zoom: 11,
+      zoom: 10,
       scale: 16, // 该层级显示卫星图层
       map: {
         width: "100%",
@@ -340,6 +355,7 @@ export default {
       loading: false, // 加载状态
       site_data: [],
       complain_points: [], // 加载投诉点
+      temp_complains: [], // 临时存储投诉点数据
       fault_points: [], // 加载故障点
       markers: [],
       keyword: "",
@@ -409,7 +425,10 @@ export default {
       search_results: [],
       show_results: false,
       activeName: "",
-      state2: ""
+      state2: "",
+      dialogFormVisible: false, // 控制对话框是否显示
+      CpAllData: [], // 获取的全量投诉数据
+      cp_edit_data: [] // 存储点击的投诉数据，用于后续编辑
     };
   },
   mounted() {
@@ -517,6 +536,9 @@ export default {
       // console.log(e) // 为选中的value
       this.search_type = e;
     },
+    startSearch() {
+      this.zoom = this.zoom + 1;
+    },
     handleSearch() {
       // console.log(e) // 为选中的value
       if (this.keyword.length < 2) {
@@ -542,6 +564,11 @@ export default {
     },
     handleShow() {
       this.show_results = true;
+    },
+    // 编辑投诉内容
+    handleUpdate() {
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
     },
     searchComplain(keyword) {
       this.show_results = true;
@@ -634,6 +661,8 @@ export default {
       if (this.zoom >= this.scale) {
         this.mapType = "BMAP_HYBRID_MAP"; // 切换至混合地图
         this.getSites(); // 缩放时动态获取站点
+        // 显示投诉数据
+        this.complain_points = this.temp_complains;
       } else {
         this.mapType = "BMAP_NORMAL_MAP";
         this.markers = []; // 清空基站图标
@@ -680,6 +709,7 @@ export default {
       getComplain(this.listQuery)
         .then(response => {
           // console.log(response.data);
+          this.CpAllData = response.data;
           var d = response.data;
           var len = d.length;
           var data = [];
@@ -703,16 +733,18 @@ export default {
               cp_time: d[i].cp_time,
               cp_info: d[i].cp_info,
               deal_info: d[i].deal_info,
-              solve_plan: d[i].solve_plan
+              solve_plan: d[i].solve_plan,
+              cp_id: d[i].cp_id,
+              index: i // 对应数据数组中的索引
             });
           }
-          this.complain_points = data;
+          this.temp_complains = data;
           var dataSet = new mapv.DataSet(data);
           var options = {
             // shadowColor: 'rgba(255, 250, 50, 1)',
             // shadowBlur: 10,
             fillStyle: "rgba(255, 50, 0, 1.0)", // 非聚合点的颜色
-            size: 2, // 非聚合点的半径
+            size: 5, // 非聚合点的半径
             minSize: 8, // 聚合点最小半径
             maxSize: 31, // 聚合点最大半径
             globalAlpha: 0.8, // 透明度
@@ -721,24 +753,9 @@ export default {
               click: function(data) {
                 console.log(data); // 点击事件
                 // alert(data.geometry.coordinates[1]); // 点击事件
-                this.infoWindow = {
-                  position: {
-                    lng: data.geometry.coordinates[0],
-                    lat: data.geometry.coordinates[1]
-                  },
-                  title: "hello",
-                  show: true,
-                  content: {
-                    info1: "投诉时间：",
-                    info2: "投诉内容：",
-                    info3: "处理过程：",
-                    info4: "解决方案："
-                  }
-                };
-                console.log(this.infoWindow);
               }
             },
-            maxZoom: 18, // 最大显示级别
+            maxZoom: 16, // 最大显示级别
             minZoom: 8, // 最小显示级别
             label: {
               // 聚合文本样式
@@ -756,6 +773,12 @@ export default {
           var mapvLayer = new mapv.baiduMapLayer(map, dataSet, options);
           console.log(mapvLayer);
           this.loading = false;
+          this.$notify({
+            title: "提示",
+            message: "数据加载成功",
+            type: "success",
+            duration: 3000
+          });
         })
         .catch(response => {
           this.loading = false;
@@ -787,6 +810,8 @@ export default {
     },
 
     clickComplainsHandler(e) {
+      // console.log(e.point.index); // 多点击的点对应所在数组的索引
+      this.cp_edit_data = this.CpAllData[e.point.index];
       var len = this.complain_points.length;
       for (var i = 0; i < len; i++) {
         var data = this.complain_points[i];
