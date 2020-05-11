@@ -137,7 +137,7 @@ export const constantRoutes = [
       {
         path: 'falut-analysis',
         name: 'FalutAnalysis',
-        component: () => import('@/views/fault/index'),
+        // component: () => import('@/views/fault/index'),
         meta: { title: '分析报表', icon: 'analysis' },
         children: [
           {
@@ -211,6 +211,29 @@ export const constantRoutes = [
         path: 'menu2',
         component: () => import('@/views/nested/menu2/index'),
         meta: { title: 'menu2' }
+      }
+    ]
+  },
+
+  {
+    path: '/demo',
+    component: Layout,
+    alwaysShow: true,
+    redirect: '/demo',
+    name: 'demo',
+    meta: { title: '组件演示', icon: 'list' },
+    children: [
+      {
+        path: 'map-demo',
+        name: 'MapDemo',
+        component: () => import('@/views/demo/mapdemo'),
+        meta: { title: '百度地图', icon: 'list' }
+      },
+      {
+        path: 'demo2',
+        name: 'demo2',
+        component: () => import('@/views/demo/i'),
+        meta: { title: '蜂窝效果', icon: 'list' }
       }
     ]
   },

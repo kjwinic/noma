@@ -223,55 +223,55 @@
                 size="mini"
               >
                 <el-row :gutter="20">
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="流水号">
                       <el-input v-model="temp.cp_no" disabled="true" />
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="投诉时间">
                       <el-input v-model="temp.cp_time" disabled="true" />
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="投诉日期">
                       <el-input v-model="temp.cp_date" disabled="true" />
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row :gutter="20">
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="县市" prop="type">
                       <el-select v-model="temp.city" class="filter-item" placeholder="选择县市">
                         <el-option v-for="item in citys" :key="item" :label="item" :value="item" />
                       </el-select>
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="用户号码">
                       <el-input v-model="temp.user_tel" disabled="true" />
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="用户星级">
                       <el-input v-model="temp.user_star" />
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row :gutter="20">
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="终端型号">
                       <el-input v-model="temp.phone_type" />
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="城区农村" prop="type">
                       <el-select v-model="temp.is_village" class="filter-item" placeholder="选择区域">
-                        <el-option v-for="item in area" :key="item" :label="item" :value="item" />
+                        <el-option v-for="item in is_village" :key="item" :label="item" :value="item" />
                       </el-select>
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="区域类型">
                       <el-select
                         v-model="temp.place"
@@ -289,14 +289,14 @@
                   </el-col>
                 </el-row>
                 <el-row>
-                  <el-col :xs="6" :sm="25" :md="50" :lg="50" :xl="80">
+                  <el-col :span="24">
                     <el-form-item label="投诉内容">
                       <el-input v-model="temp.cp_info" />
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row>
-                  <el-col :xs="6" :sm="25" :md="60" :lg="90" :xl="120">
+                  <el-col :span="24">
                     <el-form-item label="处理过程">
                       <el-input
                         v-model="temp.deal_info"
@@ -307,7 +307,7 @@
                   </el-col>
                 </el-row>
                 <el-row :gutter="20">
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="8">
+                  <el-col :span="8">
                     <el-form-item label="经度" prop="type">
                       <el-input
                         v-model="temp.lng"
@@ -317,7 +317,7 @@
                       />
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="8">
+                  <el-col :span="8">
                     <el-form-item label="纬度" prop="type">
                       <el-input
                         v-model="temp.lat"
@@ -326,7 +326,7 @@
                       />
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="8">
+                  <el-col :span="8">
                     <el-form-item label="修改报错">
                       <el-button
                         v-if="!getcoord_flag"
@@ -348,24 +348,24 @@
                   </el-col>
                 </el-row>
                 <el-row :gutter="20">
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="乡镇街道" prop="type">
                       <el-input v-model="temp.town" />
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="投诉区域" prop="type">
                       <el-input v-model="temp.area" />
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="影响人口" prop="type">
                       <el-input v-model="temp.poor_coverage" />
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row>
-                  <el-col :xs="6" :sm="25" :md="50" :lg="50" :xl="80">
+                  <el-col :span="8">
                     <el-form-item label="详细地址">
                       <el-input
                         v-model="temp.address"
@@ -376,14 +376,14 @@
                   </el-col>
                 </el-row>
                 <el-row :gutter="20">
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="原因分类" prop="type">
                       <el-select v-model="temp.cp_type" class="filter-item" placeholder="选择原因">
                         <el-option v-for="item in cp_type" :key="item" :label="item" :value="item" />
                       </el-select>
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="影响网络">
                       <el-select v-model="temp.net_type" class="filter-item" placeholder="请选择">
                         <el-option
@@ -395,14 +395,14 @@
                       </el-select>
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="6" :xl="8">
+                  <el-col :span="8">
                     <el-form-item label="投诉栅格" prop="type">
                       <el-input v-model="temp.raster" />
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row :gutter="20">
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="方案类型">
                       <el-select v-model="temp.solve_type" class="filter-item" placeholder="选择方案类型">
                         <el-option
@@ -414,19 +414,19 @@
                       </el-select>
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="解决方案" prop="type">
                       <el-input v-model="temp.solve_plan" />
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="方案进度">
                       <el-input v-model="temp.plan_progres" />
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row :gutter="20">
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="是否解决" prop="type">
                       <el-badge :value="temp.is_solved=='否'?'待解决':''" class="item">
                         <el-select
@@ -444,7 +444,7 @@
                       </el-badge>
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="预计时间">
                       <!-- <el-date-picker
               v-model="temp.plan_time"
@@ -455,14 +455,14 @@
                       <el-input v-model="temp.plan_time" placeholder="预计解决（格式2020-03-28）" />
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="实际时间">
                       <el-input v-model="temp.solved_time" placeholder="实际解决（格式2020-03-28）" />
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row>
-                  <el-col :xs="6" :sm="25" :md="60" :lg="90" :xl="120">
+                  <el-col :span="8">
                     <el-form-item label="最新进展">
                       <el-input
                         v-model="temp.tracking_info"
@@ -474,12 +474,12 @@
                   </el-col>
                 </el-row>
                 <el-row :gutter="20">
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="处理人">
                       <el-input v-model="temp.deal_user" />
                     </el-form-item>
                   </el-col>
-                  <el-col :xs="4" :sm="5" :md="6" :lg="8" :xl="12">
+                  <el-col :span="8">
                     <el-form-item label="值班人">
                       <el-input v-model="temp.duty_user" />
                     </el-form-item>
@@ -593,7 +593,7 @@ export default {
         area: ""
       },
       citys: ["柯城", "衢江", "江山", "龙游", "常山", "开化", "外地"],
-      is_village: ["城区", "农村"],
+      is_village: ["城区", "农村", "未知"],
       place: ["商业区", "居民小区", "住宅区"],
       cp_type: ["4G弱覆盖", "2G+4G弱覆盖", "2G弱覆盖", "设备故障", "无法确定"],
       net_type: ["4G", "2G+4G", "2G"],
@@ -989,8 +989,8 @@ export default {
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: this.filename,
-          autoWidth: this.autoWidth,
+          filename: "无线投诉清单",
+          // autoWidth: this.autoWidth,
           bookType: this.bookType
         });
         this.downloadLoading = false;
@@ -1067,16 +1067,17 @@ export default {
 }
 .left-form {
   display: flex;
-  width: 50%;
+  width: 40%;
 }
 .right-map {
   padding-left: 20px;
-  width: 100%;
+  width: 60%;
   border-radius: 5px;
 }
-.BMap_mask {
-  height: 650px;
-}
+// // 地图高度
+// .BMap_mask {
+//   height: 500px;
+// }
 .pop-loc {
   color: rgb(19, 19, 18);
   font-size: 20px;

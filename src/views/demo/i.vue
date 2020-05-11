@@ -151,7 +151,7 @@ export default {
             fillStyle: "rgba(55, 50, 250, 0.8)",
             shadowColor: "rgba(255, 250, 50, 1)",
             shadowBlur: 20,
-            size: 40,
+            size: 30,
             globalAlpha: 0.5,
             label: {
               show: true,
@@ -176,7 +176,7 @@ export default {
             fillStyle: "rgba(55, 50, 250, 0.8)",
             shadowColor: "rgba(55, 50, 250, 1)",
             shadowBlur: 20,
-            size: 30,
+            size: 50,
             draw: "simple"
           };
           this.loading = false;
