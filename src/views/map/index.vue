@@ -240,7 +240,7 @@
       :before-close="closeUpdate"
       class="my"
     >
-      <YiEditDialog :editdata="cp_edit_data"></YiEditDialog>
+      <YiEditDialog :editdata="cp_edit_data" @showDialog="showDialog"></YiEditDialog>
     </el-dialog>
     <!-- 搜索结果 -->
     <el-drawer
@@ -512,6 +512,9 @@ export default {
       // } else {
       //   this.listQuery.address = this.keyword // 投诉地点搜索
       // }
+    },
+    showDialog() {
+      this.dialogFormVisible = false;
     },
     // 清空条件过滤
     initFilter() {

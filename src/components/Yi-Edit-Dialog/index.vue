@@ -311,6 +311,7 @@ export default {
       net_type: ["4G", "2G+4G", "2G"],
       solve_type: ["规划", "优化", "不解决", "故障"],
       yes_or_no: ["是", "否"],
+      dialogFormVisible: false,
       change_flag: false // 是否修改标记
     };
   },
@@ -332,9 +333,11 @@ export default {
     closeUpdate() {
       // 无更新直接关闭
       if (!this.change_flag) {
-        this.dialogFormVisible = false;
+        const data = false;
+        this.$emit("showDialog", data); // 传递至父组件隐藏对话框
         return;
       }
+
       this.$confirm("修改未保存，是否确认退出?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -342,7 +345,7 @@ export default {
         center: true
       })
         .then(() => {
-          this.dialogFormVisible = false;
+          this.$emit("showDialog", false);
           this.change_flag = false; // 还原默认未修改
           // this.getcoord_flag = false;
         })
