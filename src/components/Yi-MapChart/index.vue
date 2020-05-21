@@ -42,7 +42,7 @@ export default {
     settings: {
       type: Object,
       default() {
-        return [{}];
+        return {};
       }
     },
     extend: {
@@ -68,34 +68,34 @@ export default {
   },
   data() {
     // 数据来源https://datav.aliyun.com/tools/atlas/#&lat=31.840232667909365&lng=104.2822265625&zoom=4
-    this.settings = {
-      positionJsonLink:
-        "https://geo.datav.aliyun.com/areas_v2/bound/330800_full.json",
-      position: "QZ",
-      beforeRegisterMap(json) {
-        // edit data here such as:
-        // json.features[0].properties.cp = [121.509062, 26.044332]
-        return json;
-      },
-      selectedMode: "single"
-    };
-    // 标题
-    this.title = {
-      left: "center", // 位置
-      text: "分县市投诉量", // 主标题
-      subtext: "落单投诉" // 副标题
-    };
-    this.visualMap = {
-      left: "left", // 水平位置
-      top: "70%", // 垂直位置
-      min: 5,
-      max: 30,
-      splitNumber: 5, // 区间分段数量
-      color: ["orangered", "yellow", "lightskyblue"],
-      textStyle: {
-        color: "#333"
-      }
-    };
+    // this.settings = {
+    //   positionJsonLink:
+    //     "https://geo.datav.aliyun.com/areas_v2/bound/330800_full.json",
+    //   position: "QZ",
+    //   beforeRegisterMap(json) {
+    //     // edit data here such as:
+    //     // json.features[0].properties.cp = [121.509062, 26.044332]
+    //     return json;
+    //   },
+    //   selectedMode: "single"
+    // };
+    // // 标题
+    // this.title = {
+    //   left: "center", // 位置
+    //   text: "分县市投诉量", // 主标题
+    //   subtext: "落单投诉" // 副标题
+    // };
+    // this.visualMap = {
+    //   left: "left", // 水平位置
+    //   top: "70%", // 垂直位置
+    //   min: 5,
+    //   max: 30,
+    //   splitNumber: 5, // 区间分段数量
+    //   color: ["orangered", "yellow", "lightskyblue"],
+    //   textStyle: {
+    //     color: "#333"
+    //   }
+    // };
     // 工具箱配置
     this.toolbox = {
       show: true,
@@ -108,21 +108,21 @@ export default {
         saveAsImage: {}
       }
     };
-    this.extend = {
-      series: {
-        label: {
-          normal: {
-            show: true,
-            position: "inner", // 标签的位置
-            // textStyle: {
-            //   fontWeight: 300,
-            //   fontSize: 16 // 文字的字体大小
-            // },
-            formatter: "{b}\n\n{c}起" // 设置显示格式，中间换行
-          }
-        }
-      }
-    };
+    // this.extend = {
+    //   series: {
+    //     label: {
+    //       normal: {
+    //         show: true,
+    //         position: "inner", // 标签的位置
+    //         // textStyle: {
+    //         //   fontWeight: 300,
+    //         //   fontSize: 16 // 文字的字体大小
+    //         // },
+    //         formatter: "{b}\n\n{c}起" // 设置显示格式，中间换行
+    //       }
+    //     }
+    //   }
+    // };
     var that = this;
     this.mapEvents = {
       click: function(e) {

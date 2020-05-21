@@ -38,13 +38,13 @@ export default {
     title: {
       type: Object,
       default() {
-        return [{}];
+        return {};
       }
     },
     settings: {
       type: Object,
       default() {
-        return [{}];
+        return {};
       }
     },
     extend: {
@@ -56,7 +56,7 @@ export default {
     dataZoom: {
       type: Object,
       default() {
-        return [{}];
+        return {};
       }
     },
     height: {
@@ -73,17 +73,17 @@ export default {
     }
   },
   data() {
-    this.settings = {
-      stack: { 县市: ["柯城", "衢江", "江山", "龙游", "常山", "开化"] }, // 堆叠柱状图,https://v-charts.js.org/#/histogram
-      area: true
-      // showLine: ["柯城"] // 选择显示line的
-      // metrics: ["柯城"] // 设置显示的指标维度，https://v-charts.js.org/#/data
-    };
-    this.title = {
-      left: "left",
-      subtext: "落单投诉",
-      text: "无线落单投诉量日趋势"
-    };
+    // this.settings = {
+    //   stack: { 县市: ["柯城", "衢江", "江山", "龙游", "常山", "开化"] }, // 堆叠柱状图,https://v-charts.js.org/#/histogram
+    //   area: true
+    //   // showLine: ["柯城"] // 选择显示line的
+    //   // metrics: ["柯城"] // 设置显示的指标维度，https://v-charts.js.org/#/data
+    // };
+    // this.title = {
+    //   left: "left",
+    //   subtext: "落单投诉",
+    //   text: "无线落单投诉量日趋势"
+    // };
     this.markLine = {
       data: [
         {
@@ -100,33 +100,33 @@ export default {
         }
       ]
     };
-    this.dataZoom = {
-      type: "slider",
-      start: 0,
-      end: 180
-    };
+    // this.dataZoom = {
+    //   type: "slider",
+    //   start: 0,
+    //   end: 180
+    // };
     this.toolbox = {
       feature: {
         magicType: { type: ["line", "bar"] },
         saveAsImage: {}
       }
     };
-    this.extend = {
-      // 图例显示位置
-      legend: {
-        // bottom: "20"
-        // top: "30",
-        right: "80"
-      },
-      // series: {
-      //   label: { show: true, position: "top" }
-      // },
-      // 去除分隔线
-      // https://www.echartsjs.com/zh/option.html#xAxis.splitLine
-      yAxis: {
-        splitLine: { show: false }
-      }
-    };
+    // this.extend = {
+    //   // 图例显示位置
+    //   legend: {
+    //     // bottom: "20"
+    //     // top: "30",
+    //     right: "80"
+    //   },
+    //   // series: {
+    //   //   label: { show: true, position: "top" }
+    //   // },
+    //   // 去除分隔线
+    //   // https://www.echartsjs.com/zh/option.html#xAxis.splitLine
+    //   yAxis: {
+    //     splitLine: { show: false }
+    //   }
+    // };
     return {};
   },
   created() {},
