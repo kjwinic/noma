@@ -87,7 +87,7 @@ export default {
     this.markLine = {
       data: [
         {
-          name: "平均线",
+          name: "平均值",
           type: "average"
         }
       ]
