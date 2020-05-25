@@ -23,7 +23,7 @@ import "echarts/lib/component/dataZoom"; // 设置区域缩放组件
 import "echarts/lib/component/toolbox"; // 工具箱
 import "echarts/lib/component/markLine";
 import "echarts/lib/component/markPoint";
-import "v-charts/lib/style.css"; // 使用loading属性前先引入css
+import "v-charts/lib/style.css"; // 使用loading属性，前先引入css
 
 export default {
   name: "YiLineChart",
