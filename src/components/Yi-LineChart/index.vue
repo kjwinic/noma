@@ -32,7 +32,7 @@ export default {
     data: {
       type: Object,
       default() {
-        return [{}];
+        return {};
       }
     },
     title: {
@@ -50,7 +50,7 @@ export default {
     extend: {
       type: Object,
       default() {
-        return [{}];
+        return {};
       }
     },
     dataZoom: {
