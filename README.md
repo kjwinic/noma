@@ -8,3 +8,5 @@ npm install --registry=https://registry.npm.taobao.org
 
 # 安装vue-baidu-map
 npm install vue-baidu-map --save
+
+npm install vue-cli
